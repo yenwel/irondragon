@@ -1,0 +1,7 @@
+[package]
+name = "irondragon"
+version = "0.1.0"
+authors = ["pi"]
+
+[dependencies]
+iron = "*"
