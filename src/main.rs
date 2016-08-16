@@ -9,6 +9,7 @@ use router::Router;
 use staticfile::Static;
 use mount::Mount;
 use std::path::Path;
+use std::env;
 
 fn main() {
 	// the router (for RESTfull actions)
@@ -31,9 +32,13 @@ fn main() {
 	// the mounter for static files
 	let mut mount = Mount::new();
 	mount
-		.mount("/",Static::new(Path::new("../../static/index.html")))
+		.mount("/",Static::new(Path::new("static")))
 		.mount("/api/",router)
-		.mount("/react/",Static::new(Path::new("../../bower_components/react")));
+		.mount("/react/",Static::new(Path::new("bower_components/react")));
+	let indexexists = Path::new("static/index.html").exists().to_string();
+	println!("{}",indexexists);
+	let p = env::current_dir().unwrap();
+	println!("{}",p.display());
 	Iron::new(mount).http("192.168.0.238:3000").unwrap();
 	println!("On 3000");
 }
