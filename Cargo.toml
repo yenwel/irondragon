@@ -1,8 +1,10 @@
 [package]
 name = "irondragon"
 version = "0.1.0"
-authors = ["pi"]
+authors = ["Jan Vandepitte"]
 
 [dependencies]
 iron = "*"
 router = "*"
+mount = "*"
+staticfile = "*"
