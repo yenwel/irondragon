@@ -24,4 +24,6 @@ Trying out a rust riddle microservice on my raspberryPi
 * https://github.com/iron/staticfile
 * https://www.reddit.com/r/rust/comments/31zc9m/new_to_rust_how_well_is_sqlite_supported/
 * http://www.instructables.com/id/Install-Project-Byzantium-Linux-to-a-Raspberry-Pi-/
+* https://hackaday.com/tag/olsr/
+* https://github.com/Byzantium/ByzPi/wiki/Install-Script
 
