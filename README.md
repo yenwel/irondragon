@@ -9,6 +9,7 @@ Trying out a rust riddle microservice on my raspberryPi
 * accept riddle
 * move body part or light led of rpi force directed
 * mesh netwerk (project byzantium)
+* rugged to off the grid situations?
 
 ## sculpture
 * drawings and sketches of dragon (creative commons)
@@ -26,4 +27,5 @@ Trying out a rust riddle microservice on my raspberryPi
 * http://www.instructables.com/id/Install-Project-Byzantium-Linux-to-a-Raspberry-Pi-/
 * https://hackaday.com/tag/olsr/
 * https://github.com/Byzantium/ByzPi/wiki/Install-Script
+* wit.ai (voice or text control)?
 
