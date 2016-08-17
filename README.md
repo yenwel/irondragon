@@ -20,6 +20,9 @@ Trying out a rust riddle microservice on my raspberryPi
 ## architecture
 * FE: reactjs (possibly compile to android app (react native)
 * BE: rust on rpi (iron) + Sqlite 
+ * wit.ai?
+ * mesh networking via project byzantium
+ * actor or channel rust libraries for concurrency
 
 ## links
 * https://github.com/iron/staticfile
@@ -28,4 +31,8 @@ Trying out a rust riddle microservice on my raspberryPi
 * https://hackaday.com/tag/olsr/
 * https://github.com/Byzantium/ByzPi/wiki/Install-Script
 * wit.ai (voice or text control)?
+* https://github.com/gamazeps/RobotS
+* https://github.com/kolloch/actors
+* https://doc.rust-lang.org/std/sync/mpsc/fn.channel.html
+* http://burntsushi.net/rustdoc/chan/
 
