@@ -10,6 +10,7 @@ use staticfile::Static;
 use mount::Mount;
 use std::path::Path;
 use std::env;
+use std::net;
 
 fn main() {
 	// the router (for RESTfull actions)
@@ -39,6 +40,7 @@ fn main() {
 	println!("{}",indexexists);
 	let p = env::current_dir().unwrap();
 	println!("{}",p.display());
-	Iron::new(mount).http("192.168.0.238:3000").unwrap();
+	//let ip = LookupHost::new();
+	Iron::new(mount).http("0.0.0.0:3000").unwrap();
 	println!("On 3000");
 }
