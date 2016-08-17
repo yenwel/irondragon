@@ -35,4 +35,4 @@ Trying out a rust riddle microservice on my raspberryPi
 * https://github.com/kolloch/actors
 * https://doc.rust-lang.org/std/sync/mpsc/fn.channel.html
 * http://burntsushi.net/rustdoc/chan/
-
+* http://stackoverflow.com/questions/32203610/how-to-integrate-uml-diagrams-into-gitlab-or-github
