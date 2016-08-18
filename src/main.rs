@@ -1,3 +1,5 @@
+//#![feature(lookup_host)]
+
 extern crate iron;
 extern crate router;
 extern crate mount;
@@ -10,7 +12,15 @@ use staticfile::Static;
 use mount::Mount;
 use std::path::Path;
 use std::env;
-use std::net;
+//use std::net;
+//use std::io::Error;
+
+//fn lookinguphost() -> Result<(), Error> {
+//    for host in try!(net::lookup_host("rust-lang.org")) {
+//        println!("found address : {}", try!(host));
+//    }
+//    Ok(())
+//}
 
 fn main() {
 	// the router (for RESTfull actions)
@@ -40,7 +50,7 @@ fn main() {
 	println!("{}",indexexists);
 	let p = env::current_dir().unwrap();
 	println!("{}",p.display());
-	//let ip = LookupHost::new();
+//	lookinguphost();
 	Iron::new(mount).http("0.0.0.0:3000").unwrap();
 	println!("On 3000");
 }
