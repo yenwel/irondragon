@@ -26,11 +26,11 @@ fn main() {
 	// the router (for RESTfull actions)
 	let mut router = Router::new();
 	
-	router.get("/hello",hello_world);
-	router.post("/acceptsriddle",accept_riddle);
-	//router.get("/randomriddle",random_riddle);
-	//router.post("/voteriddle",vote_riddle);
-	//router.post("/interactdragon",interact_dragon);
+	router.get("/hello",hello_world,"hello");
+	router.post("/acceptsriddle",accept_riddle,"acceptriddle");
+	//router.get("/randomriddle",random_riddle,"randomriddle");
+	//router.post("/voteriddle",vote_riddle,"voteriddle");
+	//router.post("/interactdragon",interact_dragon,"interactdragon");
 	
 	fn hello_world(_: &mut Request) -> IronResult<Response> {
 		Ok(Response::with((status::Ok, "Hello World!")))
