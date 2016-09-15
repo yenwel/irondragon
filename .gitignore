@@ -10,3 +10,4 @@ target
 >>>>>>> cccfe83a5b37280320d987e9b0823afc88f988e8
 #Cargo.lock
 .vscode
+.cargo
