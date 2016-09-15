@@ -2,19 +2,84 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Hello React!</title>
+    <title>Iron Dragon</title>
     <script src="react/react.js"></script>
     <script src="react/react-dom.js"></script>
+    <script src="react-forms/react-forms.js"></script>
     <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
   </head>
   <body>
     <div id="example"></div>
-    <script type="text/babel">
+    <!--<script type="text/babel">
       ReactDOM.render(
         <h1>Hello, world!</h1>,
         document.getElementById('example')
       );
+    </script>-->
+    <script>
+      window.addEventListener("DOMContentLoaded", function() {
+        //var React = require('react')
+        //var ReactForms = require('react-forms')
+
+        var Schema = ReactForms.schema.Schema
+        var Property = ReactForms.schema.Property
+        var Form = ReactForms.Form
+        var schema = (
+          Schema(null, 
+            Property(
+              {name:"description",
+              required:true,
+              label:"Message",
+              input:React.DOM.textarea( {placeholder:"Give us details here..."} )}
+            ),
+            Property(
+              {name:"email",
+              label:"Email",
+              required:true,
+              input:React.DOM.input( {type:"email"} ),
+              validate:function(v) { return /.+\@.+\..+/.test(v) }}
+            )
+          )
+        )
+        var MyForm = React.createClass({displayName: 'MyForm',
+
+          render: function() {
+
+            // render Form as <div /> and transfer all props to it
+            var form = this.transferPropsTo(
+              Form( {ref:"form", component:React.DOM.div} )
+            )
+
+            // return <form /> component with rendered form and a submit button
+            return (
+                React.DOM.form( {onSubmit:this.onSubmit, className:"MyForm"}, 
+                  form,
+                  React.DOM.button( {type:"submit"}, "Submit")
+                )
+            )
+          },
+
+          onSubmit: function(e) {
+            e.preventDefault()
+
+            // check if form is valid
+            var validation = this.refs.form.value().validation
+            if (ReactForms.validation.isFailure(validation)) {
+              console.log('invalid form')
+              return
+            }
+
+            alert('form submitted!')
+          }
+        })
+        React.renderComponent(
+          MyForm( {schema:schema} ),
+          document.getElementById('example'))
+
+      });
     </script>
+    <div>
+    </div>
   </body>
 </html>
 

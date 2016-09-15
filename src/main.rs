@@ -45,7 +45,8 @@ fn main() {
 	mount
 		.mount("/",Static::new(Path::new("static")))
 		.mount("/api/",router)
-		.mount("/react/",Static::new(Path::new("bower_components/react")));
+		.mount("/react/",Static::new(Path::new("bower_components/react")))
+		.mount("/react-forms/",Static::new(Path::new("bower_components/react-forms")));
 	let indexexists = Path::new("static/index.html").exists().to_string();
 	println!("{}",indexexists);
 	let p = env::current_dir().unwrap();
