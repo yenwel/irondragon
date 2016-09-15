@@ -1,3 +1,4 @@
+https://travis-ci.org/yenwel/irondragon.svg?branch=master
 # irondragon
 Trying out a rust riddle microservice on my raspberryPi
 
