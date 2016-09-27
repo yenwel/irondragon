@@ -9,7 +9,6 @@ use router::Router;
 use staticfile::Static;
 use mount::Mount;
 use std::path::Path;
-use std::env;
 
 fn main() {
 	// the router (for RESTfull actions)
