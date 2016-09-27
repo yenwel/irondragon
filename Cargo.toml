@@ -8,3 +8,6 @@ iron = "*"
 router = "*"
 mount = "*"
 staticfile = "*"
+
+[dependencies.robots]
+path = "../RobotS/target/debug"

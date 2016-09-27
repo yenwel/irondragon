@@ -2,6 +2,7 @@ extern crate iron;
 extern crate router;
 extern crate mount;
 extern crate staticfile;
+extern crate robots;
 
 use iron::prelude::*;
 use iron::status;
