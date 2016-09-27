@@ -1,5 +1,3 @@
-//#![feature(lookup_host)]
-
 extern crate iron;
 extern crate router;
 extern crate mount;
@@ -12,46 +10,31 @@ use staticfile::Static;
 use mount::Mount;
 use std::path::Path;
 use std::env;
-//use std::net;
-//use std::io::Error;
-
-//fn lookinguphost() -> Result<(), Error> {
-//    for host in try!(net::lookup_host("rust-lang.org")) {
-//        println!("found address : {}", try!(host));
-//    }
-//    Ok(())
-//}
 
 fn main() {
 	// the router (for RESTfull actions)
 	let mut router = Router::new();
 	
-	router.get("/hello",hello_world,"hello");
-	router.post("/acceptsriddle",accept_riddle,"acceptriddle");
-	//router.get("/randomriddle",random_riddle,"randomriddle");
-	//router.post("/voteriddle",vote_riddle,"voteriddle");
-	//router.post("/interactdragon",interact_dragon,"interactdragon");
-	
-	fn hello_world(_: &mut Request) -> IronResult<Response> {
-		Ok(Response::with((status::Ok, "Hello World!")))
+	router.get("/wings", move_wings,"wings");
+	router.get("/mouth", open_mouth,"mouth");
+	router.get("/eyes", blink_eyes,"eyes");
+
+	fn move_wings(_: &mut Request) -> IronResult<Response> {
+		Ok(Response::with((status::Ok, "Wings moved!")))
 	}
 
-	fn accept_riddle(_: &mut Request) -> IronResult<Response> {
-		Ok(Response::with((status::Ok, "Riddle accepted!")))
+	fn open_mouth(_: &mut Request) -> IronResult<Response> {
+		Ok(Response::with((status::Ok, "Mouth opened!")))
+	}
+
+	fn blink_eyes(_: &mut Request) -> IronResult<Response> {
+		Ok(Response::with((status::Ok, "Eyes blinked!")))
 	}
 
 	// the mounter for static files
 	let mut mount = Mount::new();
 	mount
 		.mount("/",Static::new(Path::new("static")))
-		.mount("/api/",router)
-		.mount("/react/",Static::new(Path::new("bower_components/react")))
-		.mount("/react-forms/",Static::new(Path::new("bower_components/react-forms")));
-	let indexexists = Path::new("static/index.html").exists().to_string();
-	println!("{}",indexexists);
-	let p = env::current_dir().unwrap();
-	println!("{}",p.display());
-//	lookinguphost();
+		.mount("/api/",router);
 	Iron::new(mount).http("0.0.0.0:3000").unwrap();
-	println!("On 3000");
 }
