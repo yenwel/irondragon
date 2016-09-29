@@ -3,6 +3,7 @@ extern crate router;
 extern crate mount;
 extern crate staticfile;
 extern crate robots;
+extern crate sysfs_gpio;
 
 use iron::prelude::*;
 use iron::status;
@@ -12,6 +13,7 @@ use mount::Mount;
 use std::path::Path;
 use std::any::Any;
 use robots::actors::{ActorSystem,Actor,ActorCell,ActorContext,Props};
+use sysfs_gpio::{Direction, Pin};
 
 fn main() {
 	// the router (for RESTfull actions)

@@ -9,3 +9,4 @@ router = "*"
 mount = "*"
 staticfile = "*"
 RobotS = { version = "*",  git = "https://github.com/gamazeps/RobotS" }
+sysfs_gpio = "*"
