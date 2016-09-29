@@ -8,6 +8,4 @@ iron = "*"
 router = "*"
 mount = "*"
 staticfile = "*"
-
-[dependencies.robots]
-path = "../RobotS/target/debug"
+RobotS = { version = "*",  git = "https://github.com/gamazeps/RobotS" }
