@@ -10,6 +10,8 @@ use router::Router;
 use staticfile::Static;
 use mount::Mount;
 use std::path::Path;
+use std::any::Any;
+use robots::actors::{ActorSystem,Actor,ActorCell,ActorContext,Props};
 
 fn main() {
 	// the router (for RESTfull actions)
@@ -31,6 +33,8 @@ fn main() {
 		Ok(Response::with((status::Ok, "Eyes blinked!")))
 	}
 
+	let dragon_actor_system = ActorSystem::new("dragon".to_owned());
+	dragon_actor_system.spawn_threads(3);
 	// the mounter for static files
 	let mut mount = Mount::new();
 	mount
@@ -38,3 +42,40 @@ fn main() {
 		.mount("/api/",router);
 	Iron::new(mount).http("0.0.0.0:3000").unwrap();
 }
+
+#[derive(Copy, Clone, PartialEq)]
+enum DragonCommands {
+	MoveWings,
+	OpenMouth,
+	BlinkEyes,
+}
+
+struct Dragon;
+
+impl Actor for Dragon {
+	fn receive(&self, _message: Box<Any>, _context: ActorCell){
+		if let Ok(_message) = Box::<Any>::downcast::<DragonCommands>(_message){
+			if *_message == DragonCommands::MoveWings {
+				println!("Moving Wings");
+			}
+		}
+	}
+}
+
+impl Dragon {
+	fn new(_: ()) -> Dragon {
+		Dragon
+	}
+}
+
+struct Wings;
+
+impl Actor for Wings {
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) {}
+}
+
+impl Wings {
+    fn new(_: ()) -> Wings {
+        Wings
+    }
+} 
