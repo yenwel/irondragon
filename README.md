@@ -37,3 +37,5 @@ Trying out a rust riddle microservice on my raspberryPi
 * https://doc.rust-lang.org/std/sync/mpsc/fn.channel.html
 * http://burntsushi.net/rustdoc/chan/
 * http://stackoverflow.com/questions/32203610/how-to-integrate-uml-diagrams-into-gitlab-or-github
+* https://github.com/inre/cupi
+* https://github.com/rust-embedded/rust-sysfs-gpio
