@@ -80,4 +80,6 @@ impl Wings {
     fn new(_: ()) -> Wings {
         Wings
     }
-} 
+}
+
+mod test; 
