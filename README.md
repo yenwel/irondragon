@@ -40,3 +40,4 @@ Trying out a rust riddle microservice on my raspberryPi
 * https://github.com/inre/cupi
 * https://github.com/rust-embedded/rust-sysfs-gpio
 * https://github.com/Nercury/di-rs
+* https://github.com/rustless/rustless
