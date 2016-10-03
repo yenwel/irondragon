@@ -39,3 +39,4 @@ Trying out a rust riddle microservice on my raspberryPi
 * http://stackoverflow.com/questions/32203610/how-to-integrate-uml-diagrams-into-gitlab-or-github
 * https://github.com/inre/cupi
 * https://github.com/rust-embedded/rust-sysfs-gpio
+* https://github.com/Nercury/di-rs
