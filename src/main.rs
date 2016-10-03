@@ -57,9 +57,13 @@ struct Dragon;
 impl Actor for Dragon {
 	fn receive(&self, _message: Box<Any>, _context: ActorCell){
 		if let Ok(_message) = Box::<Any>::downcast::<DragonCommands>(_message){
-			if *_message == DragonCommands::MoveWings {
-				println!("Moving Wings");
+			match *_message {
+				DragonCommands::MoveWings => println!("Moving Wings"),
+				DragonCommands::OpenMouth => println!("Opening Mouth"),
+				DragonCommands::BlinkEyes => println!("Blinking Eyes")
 			}
+		} else {
+			println!("Gorynich does not understand!");
 		}
 	}
 }
