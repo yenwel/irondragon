@@ -3,6 +3,7 @@ extern crate router;
 extern crate mount;
 extern crate staticfile;
 extern crate robots;
+extern crate sysfs_gpio;
 
 use iron::prelude::*;
 use iron::status;
