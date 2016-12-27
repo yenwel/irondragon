@@ -3,7 +3,7 @@ extern crate router;
 extern crate mount;
 extern crate staticfile;
 extern crate robots;
-extern crate sysfs_gpio;
+//extern crate sysfs_gpio;
 
 use iron::prelude::*;
 use iron::status;
@@ -12,11 +12,20 @@ use staticfile::Static;
 use mount::Mount;
 use std::path::Path;
 use std::any::Any;
+use std::sync::Arc;
 use robots::actors::{ActorSystem,Actor,ActorCell,ActorContext,Props};
-use sysfs_gpio::{Direction, Pin};
+//use sysfs_gpio::{Direction, Pin};
 
 fn main() {
-	// the router (for RESTfull actions)
+	//Dependency injection for testing
+	//will mock gpio pins, logging...
+	let dragon_actor_system = ActorSystem::new("dragon".to_owned());
+	dragon_actor_system.spawn_threads(3);
+
+    let props = Props::new(Arc::new(Dragon::new),());
+    let gorynich = dragon_actor_system.actor_of(props, "dragon".to_owned());
+	
+    // the router (for RESTfull actions)
 	let mut router = Router::new();
 	
 	router.get("/wings", move_wings,"wings");
@@ -24,6 +33,7 @@ fn main() {
 	router.get("/eyes", blink_eyes,"eyes");
 
 	fn move_wings(_: &mut Request) -> IronResult<Response> {
+        
 		Ok(Response::with((status::Ok, "Wings moved!")))
 	}
 
@@ -35,8 +45,6 @@ fn main() {
 		Ok(Response::with((status::Ok, "Eyes blinked!")))
 	}
 
-	let dragon_actor_system = ActorSystem::new("dragon".to_owned());
-	dragon_actor_system.spawn_threads(3);
 	// the mounter for static files
 	let mut mount = Mount::new();
 	mount
