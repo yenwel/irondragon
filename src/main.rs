@@ -13,11 +13,9 @@ use mount::Mount;
 use std::path::Path;
 use std::any::Any;
 use std::sync::Arc;
-use robots::actors::{ActorSystem,Actor,ActorCell,ActorContext,Props,ActorRef,Arguments};
+use robots::actors::{ActorSystem,Actor,ActorCell,ActorContext,Props,ActorRef};
 use persistent::Read;
 use iron::typemap::Key;
-use std::ops::Deref;
-use std::borrow::Borrow;
 
 #[derive(Copy, Clone)]
 pub struct Sys;
@@ -51,7 +49,7 @@ fn main() {
 	dragon_actor_system.spawn_threads(3);
 
 	let props = Props::new(Arc::new(Dragon::new),());
-	let gorynich  = dragon_actor_system.actor_of(props, "gorynich".to_owned());
+	dragon_actor_system.actor_of(props, "gorynich".to_owned());
 	
     // the router (for RESTfull actions)
 	let mut router = Router::new();
@@ -139,9 +137,18 @@ impl Actor for Dragon {
 	fn receive(&self, _message: Box<Any>, _context: ActorCell){
 		if let Ok(_message) = Box::<Any>::downcast::<DragonCommands>(_message){
 			match *_message {
-				DragonCommands::MoveWings => println!("Moving Wings"),
-				DragonCommands::OpenMouth => println!("Opening Mouth"),
-				DragonCommands::BlinkEyes => println!("Blinking Eyes")
+				DragonCommands::MoveWings => {
+						println!("Moving Wings");
+						_context.complete(_context.sender(),DragonEvents::WingsMoved);
+						},
+				DragonCommands::OpenMouth => {
+						println!("Opening Mouth");					
+						_context.complete(_context.sender(),DragonEvents::MouthOpened);
+						},
+				DragonCommands::BlinkEyes => {
+						println!("Blinking Eyes");					
+						_context.complete(_context.sender(),DragonEvents::EyesBlinked);
+						}
 			}
 		} else {
 			println!("Gorynich does not understand!");
@@ -150,7 +157,7 @@ impl Actor for Dragon {
 }
 
 impl Dragon {
-	fn new(_: ()) -> Dragon {
+	fn new(_dummy: ()) -> Dragon {
 		Dragon
 	}
 }
@@ -162,7 +169,7 @@ mod gpioaccess{
 	use sysfs_gpio::{Direction, Pin};
 }
 
-struct Wings;
+/*struct Wings;
 
 impl Actor for Wings {
     fn receive(&self, _message: Box<Any>, _context: ActorCell) {}
@@ -172,6 +179,6 @@ impl Wings {
     fn new(_: ()) -> Wings {
         Wings
     }
-}
+}*/
 
 mod test; 
