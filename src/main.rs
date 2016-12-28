@@ -59,7 +59,7 @@ fn main() {
 	router.get("/eyes", blink_eyes,"eyes"); 
 
 	fn move_wings(req:&mut Request)  -> IronResult<Response>  {
-		println!("Unwrapping sys");
+		//println!("Unwrapping sys");
 		let arcsys = req.get::<Read<Sys>>().unwrap();
     	let sys = arcsys.as_ref();
 		/*let arcdragon = req.get::<Read<DragonActor>>().unwrap();
@@ -70,13 +70,17 @@ fn main() {
     	let dragon: Option<ActorRef> = sys.extract_result(dragon);
 		match dragon {
 			None => {
-				println!("Unwrapping sys");
+				//println!("Unwrapping sys");
 				Ok(Response::with((status::Ok, "Dragon not found")))
 			}
 			Some(dragonunwrapped) => {
 				let future = sys.ask(dragonunwrapped, DragonCommands::MoveWings, "movewingsrequest".to_owned());
-	    		let x: DragonEvents = sys.extract_result(future);
-				Ok(Response::with((status::Ok, "Wings moved!")))
+	    		let event: DragonEvents = sys.extract_result(future);
+				match event{
+					DragonEvents::WingsMoved => Ok(Response::with((status::Ok, "Wings moved!"))),
+					_ =>  Ok(Response::with((status::Ok, "Unknown event!")))
+				}
+				
 			}
 		}
 	}
