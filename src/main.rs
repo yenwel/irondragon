@@ -3,6 +3,7 @@ extern crate router;
 extern crate mount;
 extern crate staticfile;
 extern crate robots;
+extern crate persistent;
 
 use iron::prelude::*;
 use iron::status;
@@ -11,35 +12,109 @@ use staticfile::Static;
 use mount::Mount;
 use std::path::Path;
 use std::any::Any;
-use robots::actors::{ActorSystem,Actor,ActorCell,ActorContext,Props};
+use std::sync::Arc;
+use robots::actors::{ActorSystem,Actor,ActorCell,ActorContext,Props,ActorRef,Arguments};
+use persistent::Read;
+use iron::typemap::Key;
+use std::ops::Deref;
+use std::borrow::Borrow;
+
+#[derive(Copy, Clone)]
+pub struct Sys;
+impl Key for Sys { type Value = ActorSystem; }
+
+#[derive(Clone, Copy)]
+pub struct DragonActor;
+impl Key for DragonActor { type Value = ActorRef; }
+
+struct Resolver;
+
+impl Actor for Resolver {
+    fn receive(&self, message: Box<Any>, context: ActorCell) {
+        if let Ok(message) = Box::<Any>::downcast::<String>(message) {
+            let future = context.identify_actor(*message, "resolver_request".to_owned());
+            context.forward_result_to_future::<Option<ActorRef>>(future, context.sender());
+        }
+    }
+}
+
+impl Resolver {
+    fn new(_dummy: ()) -> Resolver {
+        Resolver
+    }
+}
+
 
 fn main() {
-	// the router (for RESTfull actions)
+		
+	let dragon_actor_system  = ActorSystem::new("dragon".to_owned());
+	dragon_actor_system.spawn_threads(3);
+
+	let props = Props::new(Arc::new(Dragon::new),());
+	let gorynich  = dragon_actor_system.actor_of(props, "gorynich".to_owned());
+	
+    // the router (for RESTfull actions)
 	let mut router = Router::new();
 	
 	router.get("/wings", move_wings,"wings");
 	router.get("/mouth", open_mouth,"mouth");
-	router.get("/eyes", blink_eyes,"eyes");
+	router.get("/eyes", blink_eyes,"eyes"); 
 
-	fn move_wings(_: &mut Request) -> IronResult<Response> {
-		Ok(Response::with((status::Ok, "Wings moved!")))
+	fn move_wings(req:&mut Request)  -> IronResult<Response>  {
+		println!("Unwrapping sys");
+		let arcsys = req.get::<Read<Sys>>().unwrap();
+    	let sys = arcsys.as_ref();
+		/*let arcdragon = req.get::<Read<DragonActor>>().unwrap();
+    	let dragon = arcdragon.as_ref();*/
+		let props = Props::new(Arc::new(Resolver::new), ());
+    	let answerer = sys.actor_of(props.clone(), "answerer".to_owned());
+        let dragon = sys.ask(answerer, "/user/gorynich".to_owned(), "future".to_owned());
+    	let dragon: Option<ActorRef> = sys.extract_result(dragon);
+		match dragon {
+			None => {
+				println!("Unwrapping sys");
+				Ok(Response::with((status::Ok, "Dragon not found")))
+			}
+			Some(dragonunwrapped) => {
+				let future = sys.ask(dragonunwrapped, DragonCommands::MoveWings, "movewingsrequest".to_owned());
+	    		let x: DragonEvents = sys.extract_result(future);
+				Ok(Response::with((status::Ok, "Wings moved!")))
+			}
+		}
 	}
 
-	fn open_mouth(_: &mut Request) -> IronResult<Response> {
+	fn open_mouth(req: &mut Request) -> IronResult<Response> {
+		let arcsys = req.get::<Read<Sys>>().unwrap();
+    	let sys = arcsys.as_ref();
+		let props = Props::new(Arc::new(Resolver::new), ());
+    	let answerer = sys.actor_of(props.clone(), "answerer".to_owned());
+        let dragon = sys.ask(answerer, "/user/gorynich".to_owned(), "future".to_owned());
+    	let dragon: Option<ActorRef> = sys.extract_result(dragon);
+		let future = sys.ask(dragon.unwrap(), DragonCommands::OpenMouth, "openmouthrequest".to_owned());
+    	let x: DragonEvents = sys.extract_result(future);
 		Ok(Response::with((status::Ok, "Mouth opened!")))
 	}
 
-	fn blink_eyes(_: &mut Request) -> IronResult<Response> {
+	fn blink_eyes(req: &mut Request) -> IronResult<Response> {
+		let arcsys = req.get::<Read<Sys>>().unwrap();
+    	let sys = arcsys.as_ref();
+		let props = Props::new(Arc::new(Resolver::new), ());
+    	let answerer = sys.actor_of(props.clone(), "answerer".to_owned());
+        let dragon = sys.ask(answerer, "/user/gorynich".to_owned(), "future".to_owned());
+    	let dragon: Option<ActorRef> = sys.extract_result(dragon);
+		let future = sys.ask(dragon.unwrap(), DragonCommands::BlinkEyes, "blinkeyesrequest".to_owned());
+    	let x: DragonEvents = sys.extract_result(future);
 		Ok(Response::with((status::Ok, "Eyes blinked!")))
 	}
 
-	let dragon_actor_system = ActorSystem::new("dragon".to_owned());
-	dragon_actor_system.spawn_threads(3);
+	let mut chain = Chain::new(router);
+	chain.link(Read::<Sys>::both(dragon_actor_system));
+	
 	// the mounter for static files
 	let mut mount = Mount::new();
 	mount
 		.mount("/",Static::new(Path::new("static")))
-		.mount("/api/",router);
+		.mount("/api/",chain);
 	Iron::new(mount).http("0.0.0.0:3000").unwrap();
 }
 
@@ -49,6 +124,14 @@ enum DragonCommands {
 	OpenMouth,
 	BlinkEyes,
 }
+
+#[derive(Copy, Clone, PartialEq)]
+enum DragonEvents {
+	WingsMoved,
+	MouthOpened,
+	EyesBlinked,
+}
+
 
 struct Dragon;
 
@@ -70,6 +153,13 @@ impl Dragon {
 	fn new(_: ()) -> Dragon {
 		Dragon
 	}
+}
+
+#[cfg(linux)]
+mod gpioaccess{
+
+	extern crate sysfs_gpio;
+	use sysfs_gpio::{Direction, Pin};
 }
 
 struct Wings;

@@ -9,6 +9,7 @@ router = "*"
 mount = "*"
 staticfile = "*"
 RobotS = { version = "*",  git = "https://github.com/gamazeps/RobotS" }
+persistent = "*"
 
 [target.'cfg(linux)'.dependencies]
 sysfs_gpio = "*"
