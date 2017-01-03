@@ -19,11 +19,15 @@ Trying out a rust riddle microservice on my raspberryPi
 * proximity sensor?
 
 ## architecture
-* FE: reactjs (possibly compile to android app (react native)
+* FE: 
+  * reactjs (possibly compile to android app (react native) or https://phaser.io/ or https://threejs.org/
+  * http://offlinefirst.org/ (progressive webapp)
+  * https://auth0.com/blog/creating-offline-first-web-apps-with-service-workers/
 * BE: rust on rpi (iron) + Sqlite 
  * wit.ai?
  * mesh networking via project byzantium
  * actor or channel rust libraries for concurrency
+ * push notifications or websockets to update UI based on events in actors
 
 ## links
 * https://github.com/iron/staticfile
@@ -41,3 +45,5 @@ Trying out a rust riddle microservice on my raspberryPi
 * https://github.com/rust-embedded/rust-sysfs-gpio
 * https://github.com/Nercury/di-rs
 * https://github.com/rustless/rustless
+* https://github.com/mikeycgto/esper
+* https://github.com/cyderize/rust-websocket/blob/1fab3a438a5f11e97760acddfcfd8c9504094987/examples/hyper.rs
