@@ -24,10 +24,10 @@ Trying out a rust riddle microservice on my raspberryPi
   * http://offlinefirst.org/ (progressive webapp)
   * https://auth0.com/blog/creating-offline-first-web-apps-with-service-workers/
 * BE: rust on rpi (iron) + Sqlite 
- * wit.ai?
- * mesh networking via project byzantium
- * actor or channel rust libraries for concurrency
- * push notifications or websockets to update UI based on events in actors
+  * wit.ai?
+  * mesh networking via project byzantium
+  * actor or channel rust libraries for concurrency
+  * push notifications or websockets to update UI based on events in actors
 
 ## links
 * https://github.com/iron/staticfile
