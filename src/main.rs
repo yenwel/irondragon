@@ -58,55 +58,40 @@ fn main() {
 	router.get("/mouth", open_mouth,"mouth");
 	router.get("/eyes", blink_eyes,"eyes"); 
 
-	fn move_wings(req:&mut Request)  -> IronResult<Response>  {
-		//println!("Unwrapping sys");
+	fn handle_command(req: &mut Request, dragon_command: DragonCommands, dragon_event: DragonEvents ) ->IronResult<Response> {
 		let arcsys = req.get::<Read<Sys>>().unwrap();
     	let sys = arcsys.as_ref();
-		/*let arcdragon = req.get::<Read<DragonActor>>().unwrap();
-    	let dragon = arcdragon.as_ref();*/
 		let props = Props::new(Arc::new(Resolver::new), ());
     	let answerer = sys.actor_of(props.clone(), "answerer".to_owned());
         let dragon = sys.ask(answerer, "/user/gorynich".to_owned(), "future".to_owned());
     	let dragon: Option<ActorRef> = sys.extract_result(dragon);
 		match dragon {
 			None => {
-				//println!("Unwrapping sys");
 				Ok(Response::with((status::Ok, "Dragon not found")))
 			}
 			Some(dragonunwrapped) => {
-				let future = sys.ask(dragonunwrapped, DragonCommands::MoveWings, "movewingsrequest".to_owned());
+				let future = sys.ask(dragonunwrapped, dragon_command, "request".to_owned());
 	    		let event: DragonEvents = sys.extract_result(future);
-				match event{
-					DragonEvents::WingsMoved => Ok(Response::with((status::Ok, "Wings moved!"))),
-					_ =>  Ok(Response::with((status::Ok, "Unknown event!")))
-				}
-				
+				if event == dragon_event {
+					Ok(Response::with((status::Ok, "Event happened!")))
+				} else
+				{
+					Ok(Response::with((status::Ok, "Unknown event!")))
+				}				
 			}
 		}
 	}
 
-	fn open_mouth(req: &mut Request) -> IronResult<Response> {
-		let arcsys = req.get::<Read<Sys>>().unwrap();
-    	let sys = arcsys.as_ref();
-		let props = Props::new(Arc::new(Resolver::new), ());
-    	let answerer = sys.actor_of(props.clone(), "answerer".to_owned());
-        let dragon = sys.ask(answerer, "/user/gorynich".to_owned(), "future".to_owned());
-    	let dragon: Option<ActorRef> = sys.extract_result(dragon);
-		let future = sys.ask(dragon.unwrap(), DragonCommands::OpenMouth, "openmouthrequest".to_owned());
-    	let x: DragonEvents = sys.extract_result(future);
-		Ok(Response::with((status::Ok, "Mouth opened!")))
+	fn move_wings(req:&mut Request)  -> IronResult<Response>  {
+		handle_command(req,DragonCommands::MoveWings,DragonEvents::WingsMoved)
 	}
 
-	fn blink_eyes(req: &mut Request) -> IronResult<Response> {
-		let arcsys = req.get::<Read<Sys>>().unwrap();
-    	let sys = arcsys.as_ref();
-		let props = Props::new(Arc::new(Resolver::new), ());
-    	let answerer = sys.actor_of(props.clone(), "answerer".to_owned());
-        let dragon = sys.ask(answerer, "/user/gorynich".to_owned(), "future".to_owned());
-    	let dragon: Option<ActorRef> = sys.extract_result(dragon);
-		let future = sys.ask(dragon.unwrap(), DragonCommands::BlinkEyes, "blinkeyesrequest".to_owned());
-    	let x: DragonEvents = sys.extract_result(future);
-		Ok(Response::with((status::Ok, "Eyes blinked!")))
+	fn open_mouth(req: &mut Request) -> IronResult<Response> {		
+		handle_command(req,DragonCommands::OpenMouth,DragonEvents::MouthOpened)
+	}
+
+	fn blink_eyes(req: &mut Request) -> IronResult<Response> {		
+		handle_command(req,DragonCommands::BlinkEyes,DragonEvents::EyesBlinked)
 	}
 
 	let mut chain = Chain::new(router);
