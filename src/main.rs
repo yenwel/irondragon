@@ -48,7 +48,16 @@ fn main() {
 	let dragon_actor_system  = ActorSystem::new("dragon".to_owned());
 	dragon_actor_system.spawn_threads(3);
 
-	let props = Props::new(Arc::new(Dragon::new),());
+	let propswings = Props::new(Arc::new(Wings::new),());
+	let wingsactor = dragon_actor_system.actor_of(propswings, "wings".to_owned());
+	
+	let propsmouth = Props::new(Arc::new(Mouth::new),());
+	let mouthactor = dragon_actor_system.actor_of(propsmouth, "mouth".to_owned());
+	
+	let propseyes = Props::new(Arc::new(Eyes::new),());
+	let eyesactor = dragon_actor_system.actor_of(propseyes, "eyes".to_owned());
+	
+	let props = Props::new(Arc::new(Dragon::new),wingsactor, mouthactor, eyesactor);
 	dragon_actor_system.actor_of(props, "gorynich".to_owned());
 	
     // the router (for RESTfull actions)
@@ -120,7 +129,12 @@ enum DragonEvents {
 }
 
 
-struct Dragon;
+struct Dragon
+{
+	wings:  ActorRef,	
+	mouth:  ActorRef,
+	eyes: 	ActorRef,
+}
 
 impl Actor for Dragon {
 	fn receive(&self, _message: Box<Any>, _context: ActorCell){
@@ -146,8 +160,8 @@ impl Actor for Dragon {
 }
 
 impl Dragon {
-	fn new(_dummy: ()) -> Dragon {
-		Dragon
+	fn new(wings: ActorRef,mouth: ActorRef,eyes: ActorRef) -> Dragon {
+		Dragon{ wings: wings, mouth: mouth, eyes: eyes}
 	}
 }
 
@@ -158,7 +172,7 @@ mod gpioaccess{
 	use sysfs_gpio::{Direction, Pin};
 }
 
-/*struct Wings;
+struct Wings;
 
 impl Actor for Wings {
     fn receive(&self, _message: Box<Any>, _context: ActorCell) {}
@@ -168,6 +182,30 @@ impl Wings {
     fn new(_: ()) -> Wings {
         Wings
     }
-}*/
+}
+
+struct Mouth;
+
+impl Actor for Mouth {
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) {}
+}
+
+impl Mouth {
+    fn new(_: ()) -> Mouth {
+        Mouth
+    }
+}
+
+struct Eyes;
+
+impl Actor for Eyes {
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) {}
+}
+
+impl Eyes {
+    fn new(_: ()) -> Eyes {
+        Eyes
+    }
+}
 
 mod test; 
