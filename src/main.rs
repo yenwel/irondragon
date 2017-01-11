@@ -16,6 +16,7 @@ use std::sync::Arc;
 use robots::actors::{ActorSystem,Actor,ActorCell,ActorContext,Props,ActorRef};
 use persistent::Read;
 use iron::typemap::Key;
+use std::fmt::{Debug, Display,Formatter,Result};
 
 #[derive(Copy, Clone)]
 pub struct Sys;
@@ -48,16 +49,16 @@ fn main() {
 	let dragon_actor_system  = ActorSystem::new("dragon".to_owned());
 	dragon_actor_system.spawn_threads(3);
 
-	let propswings = Props::new(Arc::new(Wings::new),());
+	/*let propswings = Props::new(Arc::new(Wings::new),());
 	let wingsactor = dragon_actor_system.actor_of(propswings, "wings".to_owned());
 	
 	let propsmouth = Props::new(Arc::new(Mouth::new),());
 	let mouthactor = dragon_actor_system.actor_of(propsmouth, "mouth".to_owned());
 	
 	let propseyes = Props::new(Arc::new(Eyes::new),());
-	let eyesactor = dragon_actor_system.actor_of(propseyes, "eyes".to_owned());
+	let eyesactor = dragon_actor_system.actor_of(propseyes, "eyes".to_owned());*/
 	
-	let props = Props::new(Arc::new(Dragon::new),wingsactor, mouthactor, eyesactor);
+	let props = Props::new(Arc::new(Dragon::new),());
 	dragon_actor_system.actor_of(props, "gorynich".to_owned());
 	
     // the router (for RESTfull actions)
@@ -82,7 +83,7 @@ fn main() {
 				let future = sys.ask(dragonunwrapped, dragon_command, "request".to_owned());
 	    		let event: DragonEvents = sys.extract_result(future);
 				if event == dragon_event {
-					Ok(Response::with((status::Ok, "Event happened!")))
+					Ok(Response::with((status::Ok, dragon_event.to_string())))
 				} else
 				{
 					Ok(Response::with((status::Ok, "Unknown event!")))
@@ -114,27 +115,33 @@ fn main() {
 	Iron::new(mount).http("0.0.0.0:3000").unwrap();
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq,Debug)]
 enum DragonCommands {
 	MoveWings,
 	OpenMouth,
 	BlinkEyes,
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq,Debug)]
 enum DragonEvents {
 	WingsMoved,
 	MouthOpened,
 	EyesBlinked,
 }
 
-
-struct Dragon
-{
-	wings:  ActorRef,	
-	mouth:  ActorRef,
-	eyes: 	ActorRef,
+impl Display for DragonCommands {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Debug::fmt(self, f)
+    }
 }
+
+impl Display for DragonEvents {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Debug::fmt(self, f)
+    }
+}
+
+struct Dragon;
 
 impl Actor for Dragon {
 	fn receive(&self, _message: Box<Any>, _context: ActorCell){
@@ -160,8 +167,8 @@ impl Actor for Dragon {
 }
 
 impl Dragon {
-	fn new(wings: ActorRef,mouth: ActorRef,eyes: ActorRef) -> Dragon {
-		Dragon{ wings: wings, mouth: mouth, eyes: eyes}
+	fn new(_dummy: ()) -> Dragon {
+		Dragon
 	}
 }
 
@@ -172,7 +179,7 @@ mod gpioaccess{
 	use sysfs_gpio::{Direction, Pin};
 }
 
-struct Wings;
+/*struct Wings;
 
 impl Actor for Wings {
     fn receive(&self, _message: Box<Any>, _context: ActorCell) {}
@@ -206,6 +213,6 @@ impl Eyes {
     fn new(_: ()) -> Eyes {
         Eyes
     }
-}
+}*/
 
 mod test; 
