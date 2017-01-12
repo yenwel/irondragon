@@ -4,6 +4,7 @@ extern crate mount;
 extern crate staticfile;
 extern crate robots;
 extern crate persistent;
+extern crate env_logger;
 
 use iron::prelude::*;
 use iron::status;
@@ -13,7 +14,7 @@ use mount::Mount;
 use std::path::Path;
 use std::any::Any;
 use std::sync::Arc;
-use robots::actors::{ActorSystem,Actor,ActorCell,ActorContext,Props,ActorRef};
+use robots::actors::{ActorSystem,Actor,ActorCell,ActorContext,Props,ActorRef,ActorPath};
 use persistent::Read;
 use iron::typemap::Key;
 use std::fmt::{Debug, Display,Formatter,Result};
@@ -22,10 +23,6 @@ use std::fmt::{Debug, Display,Formatter,Result};
 pub struct Sys;
 impl Key for Sys { type Value = ActorSystem; }
 
-#[derive(Clone, Copy)]
-pub struct DragonActor;
-impl Key for DragonActor { type Value = ActorRef; }
-
 struct Resolver;
 
 impl Actor for Resolver {
@@ -33,6 +30,7 @@ impl Actor for Resolver {
         if let Ok(message) = Box::<Any>::downcast::<String>(message) {
             let future = context.identify_actor(*message, "resolver_request".to_owned());
             context.forward_result_to_future::<Option<ActorRef>>(future, context.sender());
+			context.stop(context.actor_ref());
         }
     }
 }
@@ -43,21 +41,11 @@ impl Resolver {
     }
 }
 
-
 fn main() {
-		
+	env_logger::init().unwrap();		
 	let dragon_actor_system  = ActorSystem::new("dragon".to_owned());
 	dragon_actor_system.spawn_threads(3);
 
-	/*let propswings = Props::new(Arc::new(Wings::new),());
-	let wingsactor = dragon_actor_system.actor_of(propswings, "wings".to_owned());
-	
-	let propsmouth = Props::new(Arc::new(Mouth::new),());
-	let mouthactor = dragon_actor_system.actor_of(propsmouth, "mouth".to_owned());
-	
-	let propseyes = Props::new(Arc::new(Eyes::new),());
-	let eyesactor = dragon_actor_system.actor_of(propseyes, "eyes".to_owned());*/
-	
 	let props = Props::new(Arc::new(Dragon::new),());
 	dragon_actor_system.actor_of(props, "gorynich".to_owned());
 	
@@ -144,19 +132,30 @@ impl Display for DragonEvents {
 struct Dragon;
 
 impl Actor for Dragon {
+	fn pre_start(&self, _context: ActorCell) {
+		_context.actor_of(Props::new(Arc::new(Wings::new),()), "wings".to_owned());
+		_context.actor_of(Props::new(Arc::new(Mouth::new),()), "mouth".to_owned());
+		_context.actor_of(Props::new(Arc::new(Eyes::new),()), "eyes".to_owned());
+	}	
 	fn receive(&self, _message: Box<Any>, _context: ActorCell){
+		for (path, _) in &_context.children() {
+			println!("{}",path.logical_path());
+		}
 		if let Ok(_message) = Box::<Any>::downcast::<DragonCommands>(_message){
 			match *_message {
 				DragonCommands::MoveWings => {
-						println!("Moving Wings");
+						let wings :ActorRef = _context.identify_actor("/user/gorynich/wings".to_owned(), "wing_request".to_owned());
+						_context.tell(wings,DragonCommands::MoveWings);
 						_context.complete(_context.sender(),DragonEvents::WingsMoved);
 						},
 				DragonCommands::OpenMouth => {
-						println!("Opening Mouth");					
+						let mouth :ActorRef = _context.identify_actor("/user/gorynich/mouth".to_owned(), "mouth_request".to_owned());
+						_context.tell(mouth,DragonCommands::OpenMouth);	
 						_context.complete(_context.sender(),DragonEvents::MouthOpened);
 						},
 				DragonCommands::BlinkEyes => {
-						println!("Blinking Eyes");					
+						let eyes :ActorRef = _context.identify_actor("/user/gorynich/eyes".to_owned(), "eyes_request".to_owned());
+						_context.tell(eyes,DragonCommands::BlinkEyes);	
 						_context.complete(_context.sender(),DragonEvents::EyesBlinked);
 						}
 			}
@@ -179,10 +178,10 @@ mod gpioaccess{
 	use sysfs_gpio::{Direction, Pin};
 }
 
-/*struct Wings;
+struct Wings;
 
 impl Actor for Wings {
-    fn receive(&self, _message: Box<Any>, _context: ActorCell) {}
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) { println!("Moving Wings"); }
 }
 
 impl Wings {
@@ -194,7 +193,7 @@ impl Wings {
 struct Mouth;
 
 impl Actor for Mouth {
-    fn receive(&self, _message: Box<Any>, _context: ActorCell) {}
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) { println!("Opening Mouth"); }
 }
 
 impl Mouth {
@@ -206,13 +205,13 @@ impl Mouth {
 struct Eyes;
 
 impl Actor for Eyes {
-    fn receive(&self, _message: Box<Any>, _context: ActorCell) {}
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) { println!("Blinking Eyes");	}
 }
 
 impl Eyes {
     fn new(_: ()) -> Eyes {
         Eyes
     }
-}*/
+}
 
 mod test; 

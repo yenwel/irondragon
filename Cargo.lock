@@ -3,6 +3,7 @@ name = "irondragon"
 version = "0.1.0"
 dependencies = [
  "RobotS 0.3.0 (git+https://github.com/gamazeps/RobotS)",
+ "env_logger 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "iron 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "mount 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "persistent 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
