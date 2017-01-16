@@ -46,8 +46,7 @@ fn main() {
 	let dragon_actor_system  = ActorSystem::new("dragon".to_owned());
 	dragon_actor_system.spawn_threads(3);
 
-	let props = Props::new(Arc::new(Dragon::new),dragon_actor_system.clone());
-	dragon_actor_system.actor_of(props, "gorynich".to_owned());
+	dragon_actor_system.actor_of(Props::new(Arc::new(Dragon::new),()), "gorynich".to_owned());
 	
     // the router (for RESTfull actions)
 	let mut router = Router::new();
@@ -129,26 +128,34 @@ impl Display for DragonEvents {
     }
 }
 
-struct Dragon{
-	wings: ActorRef,
-	mouth: ActorRef,
-	eyes: ActorRef,
-}
+struct Dragon;
 
 impl Actor for Dragon {
+
+	fn pre_start(&self, context: ActorCell) {
+		let wings = context.actor_of(Props::new(Arc::new(Wings::new),()), "wings".to_owned()).unwrap();
+		let mouth = context.actor_of(Props::new(Arc::new(Mouth::new),()), "mouth".to_owned()).unwrap();
+		let eyes = context.actor_of(Props::new(Arc::new(Eyes::new),()), "eyes".to_owned()).unwrap();
+		context.tell(wings,0);
+		context.tell(mouth,0);
+		context.tell(eyes,0);
+	}
 	fn receive(&self, _message: Box<Any>, _context: ActorCell){
 		if let Ok(_message) = Box::<Any>::downcast::<DragonCommands>(_message){
 			match *_message {
 				DragonCommands::MoveWings => {
-						_context.tell(self.wings.clone(),DragonCommands::MoveWings);
+						let wings: ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/wings".to_owned())).cloned().unwrap();
+						_context.tell(wings,DragonCommands::MoveWings);
 						_context.complete(_context.sender(),DragonEvents::WingsMoved);
 						},
 				DragonCommands::OpenMouth => {
-						_context.tell(self.mouth.clone(),DragonCommands::OpenMouth);
+						let mouth: ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/mouth".to_owned())).cloned().unwrap();
+						_context.tell(mouth,DragonCommands::OpenMouth);
 						_context.complete(_context.sender(),DragonEvents::MouthOpened);
 						},
 				DragonCommands::BlinkEyes => {
-						_context.tell(self.eyes.clone(),DragonCommands::BlinkEyes);
+						let eyes: ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/eyes".to_owned())).cloned().unwrap();
+						_context.tell(eyes,DragonCommands::BlinkEyes);
 						_context.complete(_context.sender(),DragonEvents::EyesBlinked);
 						}
 			}
@@ -159,8 +166,8 @@ impl Actor for Dragon {
 }
 
 impl Dragon {
-	fn new(sys: ActorSystem) -> Dragon {
-		Dragon{ wings: sys.actor_of(Props::new(Arc::new(Wings::new),()), "wings".to_owned()), mouth: sys.actor_of(Props::new(Arc::new(Mouth::new),()), "mouth".to_owned()), eyes: sys.actor_of(Props::new(Arc::new(Eyes::new),()), "eyes".to_owned())}
+	fn new(_: ()) -> Dragon {
+		Dragon
 	}
 }
 
