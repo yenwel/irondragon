@@ -49,6 +49,7 @@ impl Display for ProxyError {
 
 pub type ProxyResult<T> = ::std::result::Result<T, ProxyError>;
 
+//depend on abstractions not concretions lulz
 trait PinProxyContract {
 	
 	fn new(pin_num: u64) -> Self;
