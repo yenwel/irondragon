@@ -20,24 +20,82 @@ use iron::typemap::Key;
 use std::fmt::{Debug, Display,Formatter,Result};
 use gpioaccess::PinProxy;
 
+trait PinProxyContract {
+
+	fn new(pin_num: u64) -> Self;
+
+	fn export(&self) -> ();
+	
+	fn unexport(&self) -> ();
+
+	fn set_value(&self, value: u8) -> ();
+}
+
 #[cfg(linux)]
 pub mod gpioaccess{
 
 	extern crate sysfs_gpio;
 	use sysfs_gpio::{Direction, Pin};
-	use super::*;
+	use super::PinProxyContract;
 
-	pub struct PinProxy;
+	pub struct PinProxy {
+		pin : Pin,
+	}
 
+	impl PinProxyContract for PinProxy
+	{
+		fn new(pin_num: u64) -> PinProxy {
+			PinProxy{ pin: Pin::new(pin_num) }
+		}
+
+		fn export(&self) -> (){
+			self.pin.export();
+			();
+		}
+	
+		fn unexport(&self) -> () {
+			self.pin.unexport();
+			();
+		}
+
+		fn set_value(&self, value: u8) -> () {
+			self.pin.set_value(value);
+			();
+		}
+
+    }
 }
 
 #[cfg(not(linux))]
 pub mod gpioaccess{
 	
-	use super::*;
-	
-	pub struct PinProxy;
+	use super::PinProxyContract;
 
+	pub struct PinProxy {
+		pin_num: u64,
+	}
+
+	impl PinProxyContract for PinProxy
+	{
+		fn new(pin_num: u64) -> PinProxy {
+			PinProxy{ pin_num: pin_num }
+		}
+		
+		fn export(&self) -> ()
+		{
+			();
+		}
+	
+		fn unexport(&self) -> ()
+		{
+			();
+		}
+
+		fn set_value(&self, value: u8) -> ()
+		{
+			();
+		}
+    }
 }
 
 
