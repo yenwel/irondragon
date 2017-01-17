@@ -20,15 +20,25 @@ use iron::typemap::Key;
 use std::fmt::{Debug, Display,Formatter,Result};
 use gpioaccess::PinProxy;
 
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum DirectionProxied {
+    In,
+    Out,
+    High,
+    Low,
+}
 trait PinProxyContract {
-
+	
 	fn new(pin_num: u64) -> Self;
-
+	//FIXME :figure out mapping overloaded Result from gpio library
 	fn export(&self) -> ();
 	
 	fn unexport(&self) -> ();
 
 	fn set_value(&self, value: u8) -> ();
+
+	fn set_direction(&self, dir: DirectionProxied) -> ();
 }
 
 #[cfg(linux)]
@@ -36,7 +46,7 @@ pub mod gpioaccess{
 
 	extern crate sysfs_gpio;
 	use sysfs_gpio::{Direction, Pin};
-	use super::PinProxyContract;
+	use super::{PinProxyContract,DirectionProxied};
 
 	pub struct PinProxy {
 		pin : Pin,
@@ -63,13 +73,43 @@ pub mod gpioaccess{
 			();
 		}
 
+		fn set_direction(&self, dir: DirectionProxied) -> (){
+			let dirmapped =  match dir {
+                                           DirectionProxied::In =>  Direction::In,
+                                           DirectionProxied::Out => Direction::Out,
+                                           DirectionProxied::High => Direction::High,
+                                           DirectionProxied::Low => Direction::Low,
+                                       };
+			self.pin.set_direction(dirmapped);
+			();
+		}
+
     }
 }
 
 #[cfg(not(linux))]
 pub mod gpioaccess{
 	
-	use super::PinProxyContract;
+	use std::fmt;
+	use super::{PinProxyContract,DirectionProxied};
+
+	#[derive(Debug)]
+	pub enum Error { 
+		MonErreur, 
+	}
+
+	impl ::std::error::Error for Error {
+		fn description(&self) -> &str {
+        	"an error"
+    	}
+	}
+
+	impl fmt::Display for Error {
+		fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+			write!(f, "an error")
+		}
+	}
+
 
 	pub struct PinProxy {
 		pin_num: u64,
@@ -92,6 +132,11 @@ pub mod gpioaccess{
 		}
 
 		fn set_value(&self, value: u8) -> ()
+		{
+			();
+		}
+
+		fn set_direction(&self, dir: DirectionProxied) -> ()
 		{
 			();
 		}
