@@ -28,17 +28,38 @@ pub enum DirectionProxied {
     High,
     Low,
 }
+
+
+#[derive(Debug)]
+pub enum ProxyError { 
+	MonErreur, 
+}
+
+impl ::std::error::Error for ProxyError {
+	fn description(&self) -> &str {
+		"an error"
+	}
+}
+
+impl Display for ProxyError {
+	fn fmt(&self, f: &mut Formatter) -> Result {
+		write!(f, "an error")
+	}
+}
+
+pub type ProxyResult<T> = ::std::result::Result<T, ProxyError>;
+
 trait PinProxyContract {
 	
 	fn new(pin_num: u64) -> Self;
 	//FIXME :figure out mapping overloaded Result from gpio library
-	fn export(&self) -> ();
+	fn export(&self) -> ProxyResult<()>;
 	
-	fn unexport(&self) -> ();
+	fn unexport(&self) ->  ProxyResult<()>;
 
-	fn set_value(&self, value: u8) -> ();
+	fn set_value(&self, value: u8) -> ProxyResult<()>;
 
-	fn set_direction(&self, dir: DirectionProxied) -> ();
+	fn set_direction(&self, dir: DirectionProxied) ->  ProxyResult<()>;
 }
 
 #[cfg(linux)]
@@ -46,7 +67,7 @@ pub mod gpioaccess{
 
 	extern crate sysfs_gpio;
 	use sysfs_gpio::{Direction, Pin};
-	use super::{PinProxyContract,DirectionProxied};
+	use super::{PinProxyContract,DirectionProxied,ProxyError,ProxyResult};
 
 	pub struct PinProxy {
 		pin : Pin,
@@ -58,30 +79,46 @@ pub mod gpioaccess{
 			PinProxy{ pin: Pin::new(pin_num) }
 		}
 
-		fn export(&self) -> (){
-			self.pin.export();
-			();
+		fn export(&self) ->  ProxyResult<()>{
+			match self.pin.export()
+			{
+				Ok(()) => Ok(()),
+				_ => ProxyError::MonErreur,
+			
+			}
 		}
 	
-		fn unexport(&self) -> () {
-			self.pin.unexport();
-			();
+		fn unexport(&self) ->  ProxyResult<()> {
+			match self.pin.unexport()
+			{
+				Ok(()) => Ok(()),
+				_ => ProxyError::MonErreur,
+			
+			}
 		}
 
-		fn set_value(&self, value: u8) -> () {
-			self.pin.set_value(value);
-			();
+		fn set_value(&self, value: u8) ->  ProxyResult<()> {
+			match self.pin.set_value(value)
+			{
+				Ok(()) => Ok(()),
+				_ => ProxyError::MonErreur,
+			
+			}
 		}
 
-		fn set_direction(&self, dir: DirectionProxied) -> (){
+		fn set_direction(&self, dir: DirectionProxied) ->  ProxyResult<()>{
 			let dirmapped =  match dir {
                                            DirectionProxied::In =>  Direction::In,
                                            DirectionProxied::Out => Direction::Out,
                                            DirectionProxied::High => Direction::High,
                                            DirectionProxied::Low => Direction::Low,
                                        };
-			self.pin.set_direction(dirmapped);
-			();
+			match self.pin.set_direction(dirmapped)
+			{
+				Ok(()) => Ok(()),
+				_ => ProxyError::MonErreur,
+			
+			}
 		}
 
     }
@@ -91,25 +128,7 @@ pub mod gpioaccess{
 pub mod gpioaccess{
 	
 	use std::fmt;
-	use super::{PinProxyContract,DirectionProxied};
-
-	#[derive(Debug)]
-	pub enum Error { 
-		MonErreur, 
-	}
-
-	impl ::std::error::Error for Error {
-		fn description(&self) -> &str {
-        	"an error"
-    	}
-	}
-
-	impl fmt::Display for Error {
-		fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-			write!(f, "an error")
-		}
-	}
-
+	use super::{PinProxyContract,DirectionProxied,ProxyError,ProxyResult};
 
 	pub struct PinProxy {
 		pin_num: u64,
@@ -121,24 +140,24 @@ pub mod gpioaccess{
 			PinProxy{ pin_num: pin_num }
 		}
 		
-		fn export(&self) -> ()
+		fn export(&self) -> ProxyResult<()>
 		{
-			();
+			Ok::<(),ProxyError>(())
 		}
 	
-		fn unexport(&self) -> ()
+		fn unexport(&self) -> ProxyResult<()>
 		{
-			();
+			Ok::<(),ProxyError>(())
 		}
 
-		fn set_value(&self, value: u8) -> ()
+		fn set_value(&self, value: u8) -> ProxyResult<()>
 		{
-			();
+			Ok::<(),ProxyError>(())
 		}
 
-		fn set_direction(&self, dir: DirectionProxied) -> ()
+		fn set_direction(&self, dir: DirectionProxied) -> ProxyResult<()>
 		{
-			();
+			Ok::<(),ProxyError>(())
 		}
     }
 }
