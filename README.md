@@ -47,3 +47,5 @@ Trying out a rust riddle microservice on my raspberryPi
 * https://github.com/rustless/rustless
 * https://github.com/mikeycgto/esper
 * https://github.com/cyderize/rust-websocket/blob/1fab3a438a5f11e97760acddfcfd8c9504094987/examples/hyper.rs
+* http://stackoverflow.com/questions/19233529/run-bash-script-as-daemon
+* https://github.com/servo/rust-mozjs

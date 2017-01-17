@@ -18,6 +18,28 @@ use robots::actors::{ActorSystem,Actor,ActorCell,ActorContext,Props,ActorRef,Act
 use persistent::Read;
 use iron::typemap::Key;
 use std::fmt::{Debug, Display,Formatter,Result};
+use gpioaccess::PinProxy;
+
+#[cfg(linux)]
+pub mod gpioaccess{
+
+	extern crate sysfs_gpio;
+	use sysfs_gpio::{Direction, Pin};
+	use super::*;
+
+	pub struct PinProxy;
+
+}
+
+#[cfg(not(linux))]
+pub mod gpioaccess{
+	
+	use super::*;
+	
+	pub struct PinProxy;
+
+}
+
 
 #[derive(Copy, Clone)]
 pub struct Sys;
@@ -136,26 +158,26 @@ impl Actor for Dragon {
 		let wings = context.actor_of(Props::new(Arc::new(Wings::new),()), "wings".to_owned()).unwrap();
 		let mouth = context.actor_of(Props::new(Arc::new(Mouth::new),()), "mouth".to_owned()).unwrap();
 		let eyes = context.actor_of(Props::new(Arc::new(Eyes::new),()), "eyes".to_owned()).unwrap();
-		context.tell(wings,0);
-		context.tell(mouth,0);
-		context.tell(eyes,0);
+		context.tell(wings,LimbCommands::Init(10));
+		context.tell(mouth,LimbCommands::Init(10));
+		context.tell(eyes,LimbCommands::Init(10));
 	}
 	fn receive(&self, _message: Box<Any>, _context: ActorCell){
 		if let Ok(_message) = Box::<Any>::downcast::<DragonCommands>(_message){
 			match *_message {
 				DragonCommands::MoveWings => {
 						let wings: ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/wings".to_owned())).cloned().unwrap();
-						_context.tell(wings,DragonCommands::MoveWings);
+						_context.tell(wings,LimbCommands::Aggitate);
 						_context.complete(_context.sender(),DragonEvents::WingsMoved);
 						},
 				DragonCommands::OpenMouth => {
 						let mouth: ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/mouth".to_owned())).cloned().unwrap();
-						_context.tell(mouth,DragonCommands::OpenMouth);
+						_context.tell(mouth,LimbCommands::Aggitate);
 						_context.complete(_context.sender(),DragonEvents::MouthOpened);
 						},
 				DragonCommands::BlinkEyes => {
 						let eyes: ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/eyes".to_owned())).cloned().unwrap();
-						_context.tell(eyes,DragonCommands::BlinkEyes);
+						_context.tell(eyes,LimbCommands::Aggitate);
 						_context.complete(_context.sender(),DragonEvents::EyesBlinked);
 						}
 			}
@@ -171,17 +193,48 @@ impl Dragon {
 	}
 }
 
-#[cfg(linux)]
-mod gpioaccess{
+#[derive(Copy, Clone, PartialEq,Debug)]
+enum LimbCommands {
+	Init(u64),
+	Aggitate,
+	Reset,
+}
 
-	extern crate sysfs_gpio;
-	use sysfs_gpio::{Direction, Pin};
+#[derive(Copy, Clone, PartialEq,Debug)]
+enum LimbEvents {
+	Aggitated,
+	NotAggitated(u64),
+}
+
+impl Display for LimbCommands {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Debug::fmt(self, f)
+    }
+}
+
+impl Display for LimbEvents {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Debug::fmt(self, f)
+    }
 }
 
 struct Wings;
 
 impl Actor for Wings {
-    fn receive(&self, _message: Box<Any>, _context: ActorCell) { println!("Moving Wings"); }
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) { 
+		if let Ok(_message) = Box::<Any>::downcast::<LimbCommands>(_message){
+			match *_message {
+				LimbCommands::Init(max) => { println!("Initializing with maximum {}",max); },
+				LimbCommands::Aggitate => {
+						println!("Moving Wings");
+						//_context.complete(_context.sender(),LimbEvents::Aggitated);
+						},
+				LimbCommands::Reset => { println!("Received reset"); }
+			}
+		} else {
+			println!("Gorynich does not understand!");
+		}	
+	}
 }
 
 impl Wings {
@@ -193,7 +246,20 @@ impl Wings {
 struct Mouth;
 
 impl Actor for Mouth {
-    fn receive(&self, _message: Box<Any>, _context: ActorCell) { println!("Opening Mouth"); }
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) { 
+		if let Ok(_message) = Box::<Any>::downcast::<LimbCommands>(_message){
+			match *_message {
+				LimbCommands::Init(max) => { println!("Initializing with maximum {}",max); },
+				LimbCommands::Aggitate => {
+						println!("Opening Mouth");
+						//_context.complete(_context.sender(),LimbEvents::Aggitated);
+						},
+				LimbCommands::Reset => { println!("Received reset"); }
+			}
+		} else {
+			println!("Gorynich does not understand!");
+		}	
+	}
 }
 
 impl Mouth {
@@ -205,7 +271,20 @@ impl Mouth {
 struct Eyes;
 
 impl Actor for Eyes {
-    fn receive(&self, _message: Box<Any>, _context: ActorCell) { println!("Blinking Eyes");	}
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) { 
+		if let Ok(_message) = Box::<Any>::downcast::<LimbCommands>(_message){
+			match *_message {
+				LimbCommands::Init(max) => { println!("Initializing with maximum {}",max); },
+				LimbCommands::Aggitate => {						
+						println!("Blinking Eyes");
+						//_context.complete(_context.sender(),LimbEvents::Aggitated);
+						},
+				LimbCommands::Reset => { println!("Received reset"); }
+			}
+		} else {
+			println!("Gorynich does not understand!");
+		}
+	}
 }
 
 impl Eyes {
