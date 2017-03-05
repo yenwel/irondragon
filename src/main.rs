@@ -13,7 +13,7 @@ use staticfile::Static;
 use mount::Mount;
 use std::path::Path;
 use std::any::Any;
-use std::sync::Arc;
+use std::sync::{Arc,Mutex};
 use robots::actors::{ActorSystem,Actor,ActorCell,ActorContext,Props,ActorRef,ActorPath};
 use persistent::Read;
 use iron::typemap::Key;
@@ -413,6 +413,34 @@ impl Actor for Eyes {
 impl Eyes {
     fn new(_: ()) -> Eyes {
         Eyes
+    }
+}
+
+
+#[derive(Copy, Clone, PartialEq,Debug)]
+enum PinCommands {
+	Blink(u64),
+	Switch,
+}
+
+struct PinActor { 
+	pinproxy :  Mutex<PinProxy>, 
+}
+
+impl Actor for PinActor {
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) { 
+		if let Ok(_message) = Box::<Any>::downcast::<PinCommands>(_message){
+			match *_message {
+				PinCommands::Blink(times) => { },
+				PinCommands::Switch => {	}
+			}
+		}
+	}
+}
+
+impl PinActor{
+	fn new(pin_number: u64) -> PinActor {
+		PinActor{ pinproxy : Mutex::new(PinProxy::new(pin_number)) }
     }
 }
 
