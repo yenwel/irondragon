@@ -31,8 +31,8 @@ pub enum DirectionProxied {
 
 
 #[derive(Debug)]
-pub enum ProxyError { 
-	MonErreur, 
+pub enum ProxyError {
+	MonErreur,
 }
 
 impl ::std::error::Error for ProxyError {
@@ -51,11 +51,11 @@ pub type ProxyResult<T> = ::std::result::Result<T, ProxyError>;
 
 //depend on abstractions not concretions lulz
 trait PinProxyContract {
-	
+
 	fn new(pin_num: u64) -> Self;
 	//FIXME :figure out mapping overloaded Result from gpio library
 	fn export(&self) -> ProxyResult<()>;
-	
+
 	fn unexport(&self) ->  ProxyResult<()>;
 
 	fn set_value(&self, value: u8) -> ProxyResult<()>;
@@ -85,16 +85,15 @@ pub mod gpioaccess{
 			{
 				Ok(()) => Ok(()),
 				_ => ProxyError::MonErreur,
-			
+
 			}
 		}
-	
+
 		fn unexport(&self) ->  ProxyResult<()> {
 			match self.pin.unexport()
 			{
 				Ok(()) => Ok(()),
 				_ => ProxyError::MonErreur,
-			
 			}
 		}
 
@@ -103,7 +102,6 @@ pub mod gpioaccess{
 			{
 				Ok(()) => Ok(()),
 				_ => ProxyError::MonErreur,
-			
 			}
 		}
 
@@ -118,7 +116,6 @@ pub mod gpioaccess{
 			{
 				Ok(()) => Ok(()),
 				_ => ProxyError::MonErreur,
-			
 			}
 		}
 
@@ -127,7 +124,6 @@ pub mod gpioaccess{
 
 #[cfg(not(linux))]
 pub mod gpioaccess{
-	
 	use std::fmt;
 	use super::{PinProxyContract,DirectionProxied,ProxyError,ProxyResult};
 
@@ -140,12 +136,10 @@ pub mod gpioaccess{
 		fn new(pin_num: u64) -> PinProxy {
 			PinProxy{ pin_num: pin_num }
 		}
-		
 		fn export(&self) -> ProxyResult<()>
 		{
 			Ok::<(),ProxyError>(())
 		}
-	
 		fn unexport(&self) -> ProxyResult<()>
 		{
 			Ok::<(),ProxyError>(())
@@ -187,18 +181,16 @@ impl Resolver {
 }
 
 fn main() {
-	env_logger::init().unwrap();		
+	env_logger::init().unwrap();
 	let dragon_actor_system  = ActorSystem::new("dragon".to_owned());
 	dragon_actor_system.spawn_threads(3);
 
 	dragon_actor_system.actor_of(Props::new(Arc::new(Dragon::new),()), "gorynich".to_owned());
-	
     // the router (for RESTfull actions)
 	let mut router = Router::new();
-	
 	router.get("/wings", move_wings,"wings");
 	router.get("/mouth", open_mouth,"mouth");
-	router.get("/eyes", blink_eyes,"eyes"); 
+	router.get("/eyes", blink_eyes,"eyes");
 
 	fn handle_command(req: &mut Request, dragon_command: DragonCommands, dragon_event: DragonEvents ) ->IronResult<Response> {
 		let arcsys = req.get::<Read<Sys>>().unwrap();
@@ -219,7 +211,7 @@ fn main() {
 				} else
 				{
 					Ok(Response::with((status::Ok, "Unknown event!")))
-				}				
+				}
 			}
 		}
 	}
@@ -228,17 +220,16 @@ fn main() {
 		handle_command(req,DragonCommands::MoveWings,DragonEvents::WingsMoved)
 	}
 
-	fn open_mouth(req: &mut Request) -> IronResult<Response> {		
+	fn open_mouth(req: &mut Request) -> IronResult<Response> {
 		handle_command(req,DragonCommands::OpenMouth,DragonEvents::MouthOpened)
 	}
 
-	fn blink_eyes(req: &mut Request) -> IronResult<Response> {		
+	fn blink_eyes(req: &mut Request) -> IronResult<Response> {
 		handle_command(req,DragonCommands::BlinkEyes,DragonEvents::EyesBlinked)
 	}
 
 	let mut chain = Chain::new(router);
 	chain.link(Read::<Sys>::both(dragon_actor_system));
-	
 	// the mounter for static files
 	let mut mount = Mount::new();
 	mount
@@ -344,19 +335,23 @@ impl Display for LimbEvents {
 struct Wings;
 
 impl Actor for Wings {
-    fn receive(&self, _message: Box<Any>, _context: ActorCell) { 
+    fn pre_start(&self, context: ActorCell) {
+		   context.actor_of(Props::new(Arc::new(PinActor::new), 18), "pin18".to_owned()).unwrap();
+    }
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) {
 		if let Ok(_message) = Box::<Any>::downcast::<LimbCommands>(_message){
 			match *_message {
 				LimbCommands::Init(max) => { println!("Initializing with maximum {}",max); },
 				LimbCommands::Aggitate => {
+            let pin18 : ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/wings/pin18".to_owned())).cloned().unwrap();
+						_context.tell(pin18,PinCommands::Blink(20));
 						println!("Moving Wings");
-						//_context.complete(_context.sender(),LimbEvents::Aggitated);
-						},
+				},
 				LimbCommands::Reset => { println!("Received reset"); }
 			}
 		} else {
 			println!("Gorynich does not understand!");
-		}	
+		}
 	}
 }
 
@@ -369,19 +364,18 @@ impl Wings {
 struct Mouth;
 
 impl Actor for Mouth {
-    fn receive(&self, _message: Box<Any>, _context: ActorCell) { 
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) {
 		if let Ok(_message) = Box::<Any>::downcast::<LimbCommands>(_message){
 			match *_message {
 				LimbCommands::Init(max) => { println!("Initializing with maximum {}",max); },
 				LimbCommands::Aggitate => {
 						println!("Opening Mouth");
-						//_context.complete(_context.sender(),LimbEvents::Aggitated);
 						},
 				LimbCommands::Reset => { println!("Received reset"); }
 			}
 		} else {
 			println!("Gorynich does not understand!");
-		}	
+		}
 	}
 }
 
@@ -394,11 +388,11 @@ impl Mouth {
 struct Eyes;
 
 impl Actor for Eyes {
-    fn receive(&self, _message: Box<Any>, _context: ActorCell) { 
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) {
 		if let Ok(_message) = Box::<Any>::downcast::<LimbCommands>(_message){
 			match *_message {
 				LimbCommands::Init(max) => { println!("Initializing with maximum {}",max); },
-				LimbCommands::Aggitate => {						
+				LimbCommands::Aggitate => {
 						println!("Blinking Eyes");
 						//_context.complete(_context.sender(),LimbEvents::Aggitated);
 						},
@@ -423,15 +417,17 @@ enum PinCommands {
 	Switch,
 }
 
-struct PinActor { 
-	pinproxy :  Mutex<PinProxy>, 
+struct PinActor {
+	pinproxy :  Mutex<PinProxy>,
 }
 
 impl Actor for PinActor {
-    fn receive(&self, _message: Box<Any>, _context: ActorCell) { 
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) {
 		if let Ok(_message) = Box::<Any>::downcast::<PinCommands>(_message){
 			match *_message {
-				PinCommands::Blink(times) => { },
+				  PinCommands::Blink(times) => {
+              let pin = self.pinproxy.lock().unwrap();
+          },
 				PinCommands::Switch => {	}
 			}
 		}
@@ -444,4 +440,4 @@ impl PinActor{
     }
 }
 
-mod test; 
+mod test;
