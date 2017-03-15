@@ -244,7 +244,7 @@ fn main() {
 	mount
 		.mount("/",Static::new(Path::new("static")))
 		.mount("/api/",chain);
-	Iron::new(mount).http("0.0.0.0:3000").unwrap();
+	Iron::new(mount).http("0.0.0.0:8080").unwrap();
 }
 
 #[derive(Copy, Clone, PartialEq,Debug)]
