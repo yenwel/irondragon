@@ -93,7 +93,7 @@ pub mod gpioaccess{
 			match self.pin.unexport()
 			{
 				Ok(()) => Ok(()),
-				_ => ProxyError::MonErreur,
+				_ => yProxyError::MonErreur,
 			}
 		}
 
@@ -427,6 +427,18 @@ impl Actor for PinActor {
 			match *_message {
 				  PinCommands::Blink(times) => {
               let pin = self.pinproxy.lock().unwrap();
+              match pin.export() {
+                  Ok(()) => {
+						          println!("Pin exported");
+                      match pin.unexport() {
+                          Ok(()) => {
+						                  println!("Pin unexported");
+                          }
+                          _ => {}
+                      }
+                  }
+                  _ => {}
+              }
           },
 				PinCommands::Switch => {	}
 			}
