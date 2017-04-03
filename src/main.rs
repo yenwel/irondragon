@@ -15,6 +15,7 @@ use std::path::Path;
 use std::any::Any;
 use std::sync::{Arc,Mutex};
 use std::thread;
+use std::time;
 use robots::actors::{ActorSystem,Actor,ActorCell,ActorContext,Props,ActorRef,ActorPath};
 use persistent::Read;
 use iron::typemap::Key;
@@ -431,13 +432,11 @@ impl Actor for PinActor {
               match pin.export() {
                   Ok(()) => {
 						          println!("Pin exported");
-                      let test = try!(pin.set_direction(DirectionProxied::Out));
-                      let test2 = try!({
-                          pin.set_direction(DirectionProxied::High);
-                          thread::sleep(1);
-                          pin.set_direction(DirectionProxied::Low);
-                          thread::sleep(1);
-                      });
+                      pin.set_direction(DirectionProxied::Out);
+                      pin.set_direction(DirectionProxied::High);
+                      thread::sleep(time::Duration::from_millis(10));
+                      pin.set_direction(DirectionProxied::Low);
+                      thread::sleep(time::Duration::from_millis(10));
                       match pin.unexport() {
                           Ok(()) => {
 						                  println!("Pin unexported");
