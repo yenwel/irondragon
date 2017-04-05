@@ -23,6 +23,8 @@ Trying out a rust riddle microservice on my raspberryPi
 
 ![alt tag](https://raw.githubusercontent.com/yenwel/irondragon/master/korhoenstraat.jpg)
 
+
+
 ## architecture
 * FE: 
   * reactjs (possibly compile to android app (react native) or https://phaser.io/ or https://threejs.org/
@@ -36,7 +38,6 @@ Trying out a rust riddle microservice on my raspberryPi
 
 ![alt tag](https://raw.githubusercontent.com/yenwel/irondragon/master/dragonschema_bb.png)
 
-http://www.demorgen.be/fotografie/het-mooiste-steegje-van-gent-fec06aa8/
 
 ## links
 * https://github.com/iron/staticfile
