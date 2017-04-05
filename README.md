@@ -17,6 +17,7 @@ Trying out a rust riddle microservice on my raspberryPi
 * wireframe dragon sculpture
 * add servo and leds to sculpture, connect to gpio
 * proximity sensor?
+![alt tag](https://raw.githubusercontent.com/yenwel/irondragon/master/korhoenstraat.jpg)
 
 ## architecture
 * FE: 
