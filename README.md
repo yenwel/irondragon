@@ -29,6 +29,8 @@ Trying out a rust riddle microservice on my raspberryPi
   * actor or channel rust libraries for concurrency
   * push notifications or websockets to update UI based on events in actors
 
+![alt tag](https://raw.githubusercontent.com/yenwel/irondragon/master/dragonschema_bb.png)
+
 ## links
 * https://github.com/iron/staticfile
 * https://www.reddit.com/r/rust/comments/31zc9m/new_to_rust_how_well_is_sqlite_supported/
