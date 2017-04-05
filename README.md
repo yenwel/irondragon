@@ -1,5 +1,8 @@
 ![alt tag](https://travis-ci.org/yenwel/irondragon.svg?branch=master)
 # irondragon
+
+![alt tag](https://upload.wikimedia.org/wikipedia/commons/2/2c/Zmei_Gorinich_%28colour_fixed%29.jpg)
+
 Trying out a rust riddle microservice on my raspberryPi
 
 ## requirements
@@ -17,6 +20,7 @@ Trying out a rust riddle microservice on my raspberryPi
 * wireframe dragon sculpture
 * add servo and leds to sculpture, connect to gpio
 * proximity sensor?
+
 ![alt tag](https://raw.githubusercontent.com/yenwel/irondragon/master/korhoenstraat.jpg)
 
 ## architecture
@@ -31,6 +35,7 @@ Trying out a rust riddle microservice on my raspberryPi
   * push notifications or websockets to update UI based on events in actors
 
 ![alt tag](https://raw.githubusercontent.com/yenwel/irondragon/master/dragonschema_bb.png)
+
 http://www.demorgen.be/fotografie/het-mooiste-steegje-van-gent-fec06aa8/
 
 ## links
