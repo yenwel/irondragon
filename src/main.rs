@@ -126,7 +126,7 @@ pub mod gpioaccess{
 
 #[cfg(not(linux))]
 pub mod gpioaccess{
-	use std::fmt;
+	//use std::fmt;
 	use super::{PinProxyContract,DirectionProxied,ProxyError,ProxyResult};
 
 	pub struct PinProxy {
@@ -140,11 +140,13 @@ pub mod gpioaccess{
 		}
 		fn export(&self) -> ProxyResult<()>
 		{
+      println!("exporting pin {}",self.pin_num);
 			Ok::<(),ProxyError>(())
 		}
 		fn unexport(&self) -> ProxyResult<()>
 		{
-			Ok::<(),ProxyError>(())
+        println!("unexporting pin {}",self.pin_num);
+			  Ok::<(),ProxyError>(())
 		}
 
 		fn set_value(&self, value: u8) -> ProxyResult<()>
@@ -171,7 +173,7 @@ impl Actor for Resolver {
         if let Ok(message) = Box::<Any>::downcast::<String>(message) {
             let future = context.identify_actor(*message, "resolver_request".to_owned());
             context.forward_result_to_future::<Option<ActorRef>>(future, context.sender());
-			context.stop(context.actor_ref());
+			      context.stop(context.actor_ref());
         }
     }
 }
@@ -183,7 +185,10 @@ impl Resolver {
 }
 
 fn main() {
-	env_logger::init().unwrap();
+  match env_logger::init() {
+      Ok(()) => {}
+      _ => {}
+  };
 	let dragon_actor_system  = ActorSystem::new("dragon".to_owned());
 	dragon_actor_system.spawn_threads(3);
 
