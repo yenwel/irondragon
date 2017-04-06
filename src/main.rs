@@ -65,7 +65,7 @@ trait PinProxyContract {
 	fn set_direction(&self, dir: DirectionProxied) ->  ProxyResult<()>;
 }
 
-#[cfg(linux)]
+#[cfg(unix)]
 pub mod gpioaccess{
 
 	extern crate sysfs_gpio;
@@ -124,7 +124,7 @@ pub mod gpioaccess{
     }
 }
 
-#[cfg(not(linux))]
+#[cfg(not(unix))]
 pub mod gpioaccess{
 	//use std::fmt;
 	use super::{PinProxyContract,DirectionProxied,ProxyError,ProxyResult};
@@ -160,7 +160,6 @@ pub mod gpioaccess{
 		}
     }
 }
-
 
 #[derive(Copy, Clone)]
 pub struct Sys;
