@@ -59,3 +59,5 @@ http://www.demorgen.be/fotografie/het-mooiste-steegje-van-gent-fec06aa8/
 * https://github.com/cyderize/rust-websocket/blob/1fab3a438a5f11e97760acddfcfd8c9504094987/examples/hyper.rs
 * http://stackoverflow.com/questions/19233529/run-bash-script-as-daemon
 * https://github.com/servo/rust-mozjs
+* https://learn.adafruit.com/adafruits-raspberry-pi-lesson-8-using-a-servo-motor/software
+* https://github.com/Ogeon/rust-wiringpi
