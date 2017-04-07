@@ -69,7 +69,7 @@ trait PinProxyContract {
 pub mod gpioaccess{
 
 	extern crate sysfs_gpio;
-	use sysfs_gpio::{Direction, Pin};
+	use self::sysfs_gpio::{Direction, Pin};
 	use super::{PinProxyContract,DirectionProxied,ProxyError,ProxyResult};
 
 	pub struct PinProxy {
@@ -86,7 +86,7 @@ pub mod gpioaccess{
 			match self.pin.export()
 			{
 				Ok(()) => Ok(()),
-				_ => ProxyError::MonErreur,
+				_ => Err(ProxyError::MonErreur),
 
 			}
 		}
@@ -95,7 +95,7 @@ pub mod gpioaccess{
 			match self.pin.unexport()
 			{
 				Ok(()) => Ok(()),
-				_ => yProxyError::MonErreur,
+				_ => Err(ProxyError::MonErreur),
 			}
 		}
 
@@ -103,7 +103,7 @@ pub mod gpioaccess{
 			match self.pin.set_value(value)
 			{
 				Ok(()) => Ok(()),
-				_ => ProxyError::MonErreur,
+				_ => Err(ProxyError::MonErreur),
 			}
 		}
 
@@ -117,7 +117,7 @@ pub mod gpioaccess{
 			match self.pin.set_direction(dirmapped)
 			{
 				Ok(()) => Ok(()),
-				_ => ProxyError::MonErreur,
+				_ => Err(ProxyError::MonErreur),
 			}
 		}
 
@@ -349,8 +349,8 @@ impl Actor for Wings {
 			match *_message {
 				LimbCommands::Init(max) => { println!("Initializing with maximum {}",max); },
 				LimbCommands::Aggitate => {
-            let pin18 : ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/wings/pin18".to_owned())).cloned().unwrap();
-						_context.tell(pin18,PinCommands::Blink(20));
+                        let pin18 : ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/wings/pin18".to_owned())).cloned().unwrap();
+						_context.tell(pin18,PinCommands::Blink(5));
 						println!("Moving Wings");
 				},
 				LimbCommands::Reset => { println!("Received reset"); }
@@ -431,17 +431,20 @@ impl Actor for PinActor {
     fn receive(&self, _message: Box<Any>, _context: ActorCell) {
 		if let Ok(_message) = Box::<Any>::downcast::<PinCommands>(_message){
 			match *_message {
-				  PinCommands::Blink(times) => {
-              let pin = self.pinproxy.lock().unwrap();
-              match pin.export() {
+			    PinCommands::Blink(times) => {
+                let pin = self.pinproxy.lock().unwrap();
+                match pin.export() {
                   Ok(()) => {
-						          println!("Pin exported");
-                      pin.set_direction(DirectionProxied::Out);
-                      pin.set_direction(DirectionProxied::High);
-                      thread::sleep(time::Duration::from_millis(10));
-                      pin.set_direction(DirectionProxied::Low);
-                      thread::sleep(time::Duration::from_millis(10));
-                      match pin.unexport() {
+						        println!("Pin exported");
+                                for x in 1..times { 
+                                    pin.set_direction(DirectionProxied::Out);
+                                    pin.set_direction(DirectionProxied::High);
+                                    thread::sleep(time::Duration::from_millis(200));
+                                    pin.set_direction(DirectionProxied::Low);
+                                    thread::sleep(time::Duration::from_millis(200));
+                                    println!("Blink {}",x);
+                                }
+                                match pin.unexport() {
                           Ok(()) => {
 						                  println!("Pin unexported");
                           }
