@@ -61,3 +61,4 @@ http://www.demorgen.be/fotografie/het-mooiste-steegje-van-gent-fec06aa8/
 * https://github.com/servo/rust-mozjs
 * https://learn.adafruit.com/adafruits-raspberry-pi-lesson-8-using-a-servo-motor/software
 * https://github.com/Ogeon/rust-wiringpi
+* https://github.com/rust-embedded/rust-sysfs-pwm
