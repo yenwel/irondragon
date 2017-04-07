@@ -9,6 +9,7 @@ dependencies = [
  "persistent 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "router 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "staticfile 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sysfs-pwm 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sysfs_gpio 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -330,6 +331,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "sysfs-pwm"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "sysfs_gpio"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -486,6 +492,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum sequence_trie 0.0.13 (registry+https://github.com/rust-lang/crates.io-index)" = "d5b4eb0f7d1ff9b9666d8b8ff543f3705dd464025269a5b0e1988ffa60ca1be8"
 "checksum solicit 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)" = "172382bac9424588d7840732b250faeeef88942e37b6e35317dce98cafdd75b2"
 "checksum staticfile 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "b28e731e7fcc67ce6aa4b53359d6922e193979175fbe85d5558fc71e692e4523"
+"checksum sysfs-pwm 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "267589d5f86a21e4da23c23be6083a6bcc42b3ea90ab952cda36917231e22849"
 "checksum sysfs_gpio 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "90fc056b3e1a0f1cd10de67b14b62b85dfe450134e87bd9af2f066981c6ebb75"
 "checksum thread-id 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "a9539db560102d1cef46b8b78ce737ff0bb64e7e18d35b2a5688f7d097d0ff03"
 "checksum thread_local 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)" = "8576dbbfcaef9641452d5cf0df9b0e7eeab7694956dd33bb61515fb8f18cfdd5"
