@@ -20,7 +20,7 @@ use robots::actors::{ActorSystem,Actor,ActorCell,ActorContext,Props,ActorRef,Act
 use persistent::Read;
 use iron::typemap::Key;
 use std::fmt::{Debug, Display,Formatter,Result};
-use gpioaccess::PinProxy;
+use gpioaccess::{PinProxy,PwmProxy};
 
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -84,8 +84,12 @@ trait PwmProxyContract {
 pub mod gpioaccess{
 
 	extern crate sysfs_gpio;
+	extern crate sysfs_pwm;
+	
 	use self::sysfs_gpio::{Direction, Pin};
-	use super::{PinProxyContract,DirectionProxied,ProxyError,ProxyResult};
+	use self::sysfs_pwm::{Pwm};
+	
+	use super::{PinProxyContract,PwmProxyContract,DirectionProxied,ProxyError,ProxyResult};
 
 	pub struct PinProxy {
 		pin : Pin,
@@ -135,14 +139,68 @@ pub mod gpioaccess{
 				_ => Err(ProxyError::MonErreur),
 			}
 		}
+    }
+    
+    pub struct PwmProxy {
+		pwm : Pwm,
+	}
 
+	impl PwmProxyContract for PwmProxy
+	{
+		fn new(chip: u32, number: u32) -> PwmProxy {
+			PwmProxy{ pwm: Pwm::new(chip, number).unwrap() }
+		}
+
+		fn export(&self) ->  ProxyResult<()>{
+			match self.pwm.export()
+			{
+				Ok(()) => Ok(()),
+				_ => Err(ProxyError::MonErreur),
+
+			}
+		}
+
+		fn unexport(&self) ->  ProxyResult<()> {
+			match self.pwm.unexport()
+			{
+				Ok(()) => Ok(()),
+				_ => Err(ProxyError::MonErreur),
+			}
+		}
+		
+		fn enable(&self, enable: bool) -> ProxyResult<()>
+		{
+			match self.pwm.enable(enable)
+			{
+				Ok(()) => Ok(()),
+				_ => Err(ProxyError::MonErreur),
+			}
+		}
+	
+		fn set_duty_cycle_ns(&self, duty_cycle_ns: u32) -> ProxyResult<()>
+		{
+			match self.pwm.set_duty_cycle_ns(duty_cycle_ns)
+			{
+				Ok(()) => Ok(()),
+				_ => Err(ProxyError::MonErreur),
+			}
+		}
+	
+		fn set_period_ns(&self, period_ns: u32) -> ProxyResult<()>
+		{
+			match self.pwm.set_period_ns(period_ns)
+			{
+				Ok(()) => Ok(()),
+				_ => Err(ProxyError::MonErreur),
+			}
+		}
     }
 }
 
 #[cfg(not(unix))]
 pub mod gpioaccess{
-	//use std::fmt;
-	use super::{PinProxyContract,DirectionProxied,ProxyError,ProxyResult};
+
+	use super::{PinProxyContract,PwmProxyContract,DirectionProxied,ProxyError,ProxyResult};
 
 	pub struct PinProxy {
 		pin_num: u64,
@@ -155,13 +213,13 @@ pub mod gpioaccess{
 		}
 		fn export(&self) -> ProxyResult<()>
 		{
-      println!("exporting pin {}",self.pin_num);
+    		println!("exporting pin {}",self.pin_num);
 			Ok::<(),ProxyError>(())
 		}
 		fn unexport(&self) -> ProxyResult<()>
 		{
-        println!("unexporting pin {}",self.pin_num);
-			  Ok::<(),ProxyError>(())
+        	println!("unexporting pin {}",self.pin_num);
+			Ok::<(),ProxyError>(())
 		}
 
 		fn set_value(&self, value: u8) -> ProxyResult<()>
@@ -174,6 +232,41 @@ pub mod gpioaccess{
 			Ok::<(),ProxyError>(())
 		}
     }
+    
+    pub struct PwmProxy {
+		chip : u32,
+		number : u32
+	}
+
+	impl PwmProxyContract for PwmProxy
+	{
+		fn new(chip: u32, number: u32) -> PwmProxy {
+			PwmProxy{ chip : chip, number : number }
+		}
+
+		fn export(&self) ->  ProxyResult<()>{
+			Ok::<(),ProxyError>(())
+		}
+
+		fn unexport(&self) ->  ProxyResult<()> {
+			Ok::<(),ProxyError>(())
+		}
+		
+		fn enable(&self, enable: bool) -> ProxyResult<()>
+		{
+			Ok::<(),ProxyError>(())
+		}
+	
+		fn set_duty_cycle_ns(&self, duty_cycle_ns: u32) -> ProxyResult<()>
+		{
+			Ok::<(),ProxyError>(())
+		}
+	
+		fn set_period_ns(&self, period_ns: u32) -> ProxyResult<()>
+		{
+			Ok::<(),ProxyError>(())
+		}
+	}
 }
 
 #[derive(Copy, Clone)]
@@ -447,28 +540,28 @@ impl Actor for PinActor {
 		if let Ok(_message) = Box::<Any>::downcast::<PinCommands>(_message){
 			match *_message {
 			    PinCommands::Blink(times) => {
-                let pin = self.pinproxy.lock().unwrap();
-                match pin.export() {
-                  Ok(()) => {
-						        println!("Pin exported");
-                                for x in 1..times { 
-                                    pin.set_direction(DirectionProxied::Out);
-                                    pin.set_direction(DirectionProxied::High);
-                                    thread::sleep(time::Duration::from_millis(200));
-                                    pin.set_direction(DirectionProxied::Low);
-                                    thread::sleep(time::Duration::from_millis(200));
-                                    println!("Blink {}",x);
-                                }
-                                match pin.unexport() {
-                          Ok(()) => {
-						                  println!("Pin unexported");
-                          }
-                          _ => {}
-                      }
-                  }
-                  _ => {}
-              }
-          },
+                	let pin = self.pinproxy.lock().unwrap();
+                	match pin.export() {
+                		Ok(()) => {
+						    println!("Pin exported");
+                            for x in 1..times { 
+                                pin.set_direction(DirectionProxied::Out);
+                                pin.set_direction(DirectionProxied::High);
+                                thread::sleep(time::Duration::from_millis(200));
+                                pin.set_direction(DirectionProxied::Low);
+                                thread::sleep(time::Duration::from_millis(200));
+                                println!("Blink {}",x);
+                            }
+                            match pin.unexport() {
+                        		Ok(()) => {
+						        	println!("Pin unexported");
+                        		}
+                        		_ => {}
+                    		}
+                		}
+                		_ => {}
+            		}
+        		},
 				PinCommands::Switch => {	}
 			}
 		}
@@ -478,6 +571,46 @@ impl Actor for PinActor {
 impl PinActor{
 	fn new(pin_number: u64) -> PinActor {
 		PinActor{ pinproxy : Mutex::new(PinProxy::new(pin_number)) }
+    }
+}
+
+
+#[derive(Copy, Clone, PartialEq,Debug)]
+enum PwmCommands {
+	MoveToDegree(u16)
+}
+
+struct PwmActor {
+	pwmproxy :  Mutex<PwmProxy>,
+}
+
+impl Actor for PwmActor {
+    fn receive(&self, _message: Box<Any>, _context: ActorCell) {
+		if let Ok(_message) = Box::<Any>::downcast::<PwmCommands>(_message){
+			match *_message {
+			    PwmCommands::MoveToDegree(degree) => {
+                	let pwm = self.pwmproxy.lock().unwrap();
+                	match pwm.export() {
+                		Ok(()) => {
+						    println!("Pwm exported");
+                            match pwm.unexport() {
+                        		Ok(()) => {
+						        	println!("Pwm unexported");
+                        		}
+                        		_ => {}
+                    		}
+                		}
+                		_ => {}
+            		}
+        		}			
+			}
+		}
+	}
+}
+
+impl PwmActor{
+	fn new(chip: u32, number: u32) -> PwmActor {
+		PwmActor{ pwmproxy : Mutex::new(PwmProxy::new(chip,number)) }
     }
 }
 
