@@ -65,6 +65,21 @@ trait PinProxyContract {
 	fn set_direction(&self, dir: DirectionProxied) ->  ProxyResult<()>;
 }
 
+trait PwmProxyContract {
+
+	fn  new(chip: u32, number: u32) -> Self;
+	//FIXME :figure out mapping overloaded Result from gpio library
+	fn export(&self) -> ProxyResult<()>;
+
+	fn unexport(&self) ->  ProxyResult<()>;
+	
+	fn enable(&self, enable: bool) -> ProxyResult<()>;
+	
+	fn set_duty_cycle_ns(&self, duty_cycle_ns: u32) -> ProxyResult<()>;
+	
+	fn set_period_ns(&self, period_ns: u32) -> ProxyResult<()>;
+}
+
 #[cfg(unix)]
 pub mod gpioaccess{
 
