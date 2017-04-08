@@ -450,16 +450,16 @@ struct Wings;
 
 impl Actor for Wings {
     fn pre_start(&self, context: ActorCell) {
-		   context.actor_of(Props::new(Arc::new(PinActor::new), 18), "pin18".to_owned()).unwrap();
+		   context.actor_of(Props::new(Arc::new(PwmActor::new), 18), "pwm18".to_owned()).unwrap();
     }
     fn receive(&self, _message: Box<Any>, _context: ActorCell) {
 		if let Ok(_message) = Box::<Any>::downcast::<LimbCommands>(_message){
 			match *_message {
 				LimbCommands::Init(max) => { println!("Initializing with maximum {}",max); },
 				LimbCommands::Aggitate => {
-                        let pin18 : ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/wings/pin18".to_owned())).cloned().unwrap();
-						_context.tell(pin18,PinCommands::Blink(5));
-						println!("Moving Wings");
+                    let pwm18 : ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/wings/pwm18".to_owned())).cloned().unwrap();
+					_context.tell(pwm18,PwmCommands::MoveToDegree(90));
+					println!("Moving Wings");
 				},
 				LimbCommands::Reset => { println!("Received reset"); }
 			}
@@ -483,8 +483,8 @@ impl Actor for Mouth {
 			match *_message {
 				LimbCommands::Init(max) => { println!("Initializing with maximum {}",max); },
 				LimbCommands::Aggitate => {
-						println!("Opening Mouth");
-						},
+					println!("Opening Mouth");
+				},
 				LimbCommands::Reset => { println!("Received reset"); }
 			}
 		} else {
@@ -502,14 +502,20 @@ impl Mouth {
 struct Eyes;
 
 impl Actor for Eyes {
+
+    fn pre_start(&self, context: ActorCell) {
+		   context.actor_of(Props::new(Arc::new(PinActor::new), 22), "pin22".to_owned()).unwrap();
+    }
+    
     fn receive(&self, _message: Box<Any>, _context: ActorCell) {
 		if let Ok(_message) = Box::<Any>::downcast::<LimbCommands>(_message){
 			match *_message {
 				LimbCommands::Init(max) => { println!("Initializing with maximum {}",max); },
 				LimbCommands::Aggitate => {
-						println!("Blinking Eyes");
-						//_context.complete(_context.sender(),LimbEvents::Aggitated);
-						},
+					println!("Blinking Eyes");
+					let pin22 : ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/wings/pin22".to_owned())).cloned().unwrap();
+					_context.tell(pin22,PinCommands::Blink(5));
+				},
 				LimbCommands::Reset => { println!("Received reset"); }
 			}
 		} else {
@@ -609,8 +615,8 @@ impl Actor for PwmActor {
 }
 
 impl PwmActor{
-	fn new(chip: u32, number: u32) -> PwmActor {
-		PwmActor{ pwmproxy : Mutex::new(PwmProxy::new(chip,number)) }
+	fn new(number: u32) -> PwmActor {
+		PwmActor{ pwmproxy : Mutex::new(PwmProxy::new(0,number)) }
     }
 }
 
