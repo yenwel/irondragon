@@ -78,6 +78,12 @@ trait PwmProxyContract {
 	fn set_duty_cycle_ns(&self, duty_cycle_ns: u32) -> ProxyResult<()>;
 	
 	fn set_period_ns(&self, period_ns: u32) -> ProxyResult<()>;
+	
+	fn get_period_ns(&self) -> ProxyResult<u32>;
+	
+	fn increase_to_max(&self, duration_ms: u32, update_period_ms: u32);
+
+	fn decrease_to_minimum(&self, duration_ms: u32, update_period_ms: u32);
 }
 
 #[cfg(unix)]
@@ -194,6 +200,51 @@ pub mod gpioaccess{
 				_ => Err(ProxyError::MonErreur),
 			}
 		}
+		
+		fn get_period_ns(&self) -> ProxyResult<u32>
+		{
+			match self.pwm.get_period_ns()
+			{
+				Ok(result) => Ok(result),
+				_ => Err(ProxyError::MonErreur),
+			}
+			
+		}
+		
+		fn increase_to_max(&self, duration_ms: u32, update_period_ms: u32)
+		{
+		    let step: f32 = duration_ms as f32 / update_period_ms as f32;
+    		let mut duty_cycle = 0.0;
+    		match self.pwm.get_period_ns()
+    		{
+    			Ok(period_ns) => {
+    				while duty_cycle < 1.0 {
+        				self.pwm.set_duty_cycle_ns((duty_cycle * period_ns as f32) as u32).unwrap();
+        				duty_cycle += step;
+    				}
+    				self.pwm.set_duty_cycle_ns(period_ns).unwrap()
+    			}
+    			_ => {}
+    		}
+		}
+		
+		fn decrease_to_minimum(&self, duration_ms: u32, update_period_ms: u32)
+		{
+			let step: f32 = duration_ms as f32 / update_period_ms as f32;
+    		let mut duty_cycle = 1.0;
+    		match self.pwm.get_period_ns()
+    		{
+    			Ok(period_ns) => {
+    				while duty_cycle > 0.0 {
+        				self.pwm.set_duty_cycle_ns((duty_cycle * period_ns as f32) as u32).unwrap();
+        				duty_cycle -= step;
+    				}
+    				self.pwm.set_duty_cycle_ns(0).unwrap()
+    			}
+    			_ => {}
+    		}
+		}
+
     }
 }
 
@@ -265,6 +316,12 @@ pub mod gpioaccess{
 		fn set_period_ns(&self, period_ns: u32) -> ProxyResult<()>
 		{
 			Ok::<(),ProxyError>(())
+		}
+		
+		fn get_period_ns(&self) -> ProxyResult<u32>
+		{
+			Ok::<u32,ProxyError>(1)
+			
 		}
 	}
 }
@@ -450,7 +507,7 @@ struct Wings;
 
 impl Actor for Wings {
     fn pre_start(&self, context: ActorCell) {
-		   context.actor_of(Props::new(Arc::new(PwmActor::new), 18), "pwm18".to_owned()).unwrap();
+		   context.actor_of(Props::new(Arc::new(PwmActor::new), 0), "pwm18".to_owned()).unwrap();
     }
     fn receive(&self, _message: Box<Any>, _context: ActorCell) {
 		if let Ok(_message) = Box::<Any>::downcast::<LimbCommands>(_message){
@@ -599,6 +656,12 @@ impl Actor for PwmActor {
                 	match pwm.export() {
                 		Ok(()) => {
 						    println!("Pwm exported");
+						    pwm.enable(true).unwrap();
+        					pwm.set_period_ns(20_000).unwrap();
+					        for x in 1..10 {
+					            pwm.increase_to_max(1000, 20);
+					        	pwm.decrease_to_minimum(1000, 20);
+					        }
                             match pwm.unexport() {
                         		Ok(()) => {
 						        	println!("Pwm unexported");
