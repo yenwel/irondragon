@@ -63,3 +63,4 @@ http://www.demorgen.be/fotografie/het-mooiste-steegje-van-gent-fec06aa8/
 * https://github.com/Ogeon/rust-wiringpi
 * https://github.com/rust-embedded/rust-sysfs-pwm
 * https://github.com/jonathandturner/rhai
+* http://www.jumpnowtek.com/rpi/Using-the-Raspberry-Pi-Hardware-PWM-timers.html
