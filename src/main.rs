@@ -67,7 +67,7 @@ trait PinProxyContract {
 
 trait PwmProxyContract {
 
-	fn  new(chip: u32, number: u32) -> Self;
+	fn  new(chip: u32, number: u32) -> ProxyResult<Self> where Self: Sized;
 	//FIXME :figure out mapping overloaded Result from gpio library
 	fn export(&self) -> ProxyResult<()>;
 
@@ -153,8 +153,13 @@ pub mod gpioaccess{
 
 	impl PwmProxyContract for PwmProxy
 	{
-		fn new(chip: u32, number: u32) -> PwmProxy {
-			PwmProxy{ pwm: Pwm::new(chip, number).unwrap() }
+		fn new(chip: u32, number: u32) -> ProxyResult<PwmProxy>{
+			
+			match Pwm::new(chip, number) {
+				Ok(pwm) => Ok(PwmProxy{ pwm: pwm}),
+				_ => Err(ProxyError::MonErreur)
+			}
+			
 		}
 
 		fn export(&self) ->  ProxyResult<()>{
@@ -648,7 +653,7 @@ enum PwmCommands {
 }
 
 struct PwmActor {
-	pwmproxy :  Mutex<PwmProxy>,
+	pwmproxy :  Mutex<ProxyResult<PwmProxy>>,
 }
 
 impl Actor for PwmActor {
