@@ -661,25 +661,37 @@ impl Actor for PwmActor {
 		if let Ok(_message) = Box::<Any>::downcast::<PwmCommands>(_message){
 			match *_message {
 			    PwmCommands::MoveToDegree(degree) => {
-                	let pwm = self.pwmproxy.lock().unwrap();
-                	match pwm.export() {
-                		Ok(()) => {
-						    println!("Pwm exported");
-						    pwm.enable(true).unwrap();
-        					pwm.set_period_ns(20_000).unwrap();
-					        for x in 1..10 {
-					            pwm.increase_to_max(1000, 20);
-					        	pwm.decrease_to_minimum(1000, 20);
-					        }
-                            match pwm.unexport() {
-                        		Ok(()) => {
-						        	println!("Pwm unexported");
-                        		}
-                        		_ => {}
-                    		}
+                	match self.pwmproxy.lock()
+                	{
+                		Ok(result) => {
+                			match result
+                			{
+                				Ok(pwm) => {
+                					match pwm.export() {
+                						Ok(()) => {
+						    				println!("Pwm exported");
+						    				pwm.enable(true).unwrap();
+        									pwm.set_period_ns(20_000).unwrap();
+									        for x in 1..10 {
+									            pwm.increase_to_max(1000, 20);
+									        	pwm.decrease_to_minimum(1000, 20);
+									        }
+				                            match pwm.unexport() {
+				                        		Ok(()) => {
+										        	println!("Pwm unexported");
+				                        		}
+				                        		_ => {}
+				                    		}
+                						}
+                						_ => {}
+            						}
+                					
+                				}
+                				_ => {}
+                			}
                 		}
                 		_ => {}
-            		}
+                	}
         		}			
 			}
 		}
