@@ -323,6 +323,10 @@ pub mod gpioaccess{
 			Ok::<u32,ProxyError>(1)
 			
 		}
+		
+		fn increase_to_max(&self, duration_ms: u32, update_period_ms: u32) {}
+
+		fn decrease_to_minimum(&self, duration_ms: u32, update_period_ms: u32) {}
 	}
 }
 
