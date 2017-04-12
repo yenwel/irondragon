@@ -21,6 +21,7 @@ use persistent::Read;
 use iron::typemap::Key;
 use std::fmt::{Debug, Display,Formatter,Result};
 use gpioaccess::{PinProxy,PwmProxy};
+use std::clone::Clone;
 
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -296,8 +297,8 @@ pub mod gpioaccess{
 
 	impl PwmProxyContract for PwmProxy
 	{
-		fn new(chip: u32, number: u32) -> PwmProxy {
-			PwmProxy{ chip : chip, number : number }
+		fn new(chip: u32, number: u32) -> ProxyResult<PwmProxy> {
+			Ok(PwmProxy{ chip : chip, number : number })
 		}
 
 		fn export(&self) ->  ProxyResult<()>{
@@ -661,37 +662,25 @@ impl Actor for PwmActor {
 		if let Ok(_message) = Box::<Any>::downcast::<PwmCommands>(_message){
 			match *_message {
 			    PwmCommands::MoveToDegree(degree) => {
-                	match self.pwmproxy.lock()
-                	{
-                		Ok(result) => {
-                			match result
-                			{
-                				Ok(pwm) => {
-                					match pwm.export() {
-                						Ok(()) => {
-						    				println!("Pwm exported");
-						    				pwm.enable(true).unwrap();
-        									pwm.set_period_ns(20_000).unwrap();
-									        for x in 1..10 {
-									            pwm.increase_to_max(1000, 20);
-									        	pwm.decrease_to_minimum(1000, 20);
-									        }
-				                            match pwm.unexport() {
-				                        		Ok(()) => {
-										        	println!("Pwm unexported");
-				                        		}
-				                        		_ => {}
-				                    		}
-                						}
-                						_ => {}
-            						}
-                					
-                				}
-                				_ => {}
-                			}
-                		}
-                		_ => {}
-                	}
+					let pwm = self.pwmproxy.lock().unwrap().unwrap().clone();
+					match pwm.export() {
+						Ok(()) => {
+							println!("Pwm exported");
+							pwm.enable(true).unwrap();
+							pwm.set_period_ns(20_000).unwrap();
+							for x in 1..10 {
+								pwm.increase_to_max(1000, 20);
+								pwm.decrease_to_minimum(1000, 20);
+							}
+							match pwm.unexport() {
+								Ok(()) => {
+									println!("Pwm unexported");
+								}
+								_ => {}
+							}
+						}
+						_ => {}
+					}
         		}			
 			}
 		}
