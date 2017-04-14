@@ -65,3 +65,5 @@ http://www.demorgen.be/fotografie/het-mooiste-steegje-van-gent-fec06aa8/
 * https://github.com/jonathandturner/rhai
 * http://www.jumpnowtek.com/rpi/Using-the-Raspberry-Pi-Hardware-PWM-timers.html
 * http://elinux.org/RPi_BCM2835_GPIOs#GPIO18
+
+On Windows in Powershell: $env:RUST_BACKTRACE = 1

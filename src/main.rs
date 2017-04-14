@@ -68,7 +68,7 @@ trait PinProxyContract {
 
 trait PwmProxyContract {
 
-	fn  new(chip: u32, number: u32) -> ProxyResult<Self> where Self: Sized;
+	fn  new(chip: u32, number: u32) -> /*ProxyResult<*/Self/*>*/ where Self: Sized;
 	//FIXME :figure out mapping overloaded Result from gpio library
 	fn export(&self) -> ProxyResult<()>;
 
@@ -154,13 +154,13 @@ pub mod gpioaccess{
 
 	impl PwmProxyContract for PwmProxy
 	{
-		fn new(chip: u32, number: u32) -> ProxyResult<PwmProxy>{
+		fn new(chip: u32, number: u32) -> /*ProxyResult<*/PwmProxy/*>*/{
 			
-			match Pwm::new(chip, number) {
+			/*match Pwm::new(chip, number) {
 				Ok(pwm) => Ok(PwmProxy{ pwm: pwm}),
 				_ => Err(ProxyError::MonErreur)
-			}
-			
+			}*/
+			PwmProxy{ pwm: Pwm::new(chip, number).unwrap()}
 		}
 
 		fn export(&self) ->  ProxyResult<()>{
@@ -297,8 +297,8 @@ pub mod gpioaccess{
 
 	impl PwmProxyContract for PwmProxy
 	{
-		fn new(chip: u32, number: u32) -> ProxyResult<PwmProxy> {
-			Ok(PwmProxy{ chip : chip, number : number })
+		fn new(chip: u32, number: u32) -> /*ProxyResult<*/PwmProxy/*>*/ {
+			/*Ok(*/PwmProxy{ chip : chip, number : number }/*)*/
 		}
 
 		fn export(&self) ->  ProxyResult<()>{
@@ -580,7 +580,7 @@ impl Actor for Eyes {
 				LimbCommands::Init(max) => { println!("Initializing with maximum {}",max); },
 				LimbCommands::Aggitate => {
 					println!("Blinking Eyes");
-					let pin22 : ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/wings/pin22".to_owned())).cloned().unwrap();
+					let pin22 : ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/eyes/pin22".to_owned())).cloned().unwrap();
 					_context.tell(pin22,PinCommands::Blink(5));
 				},
 				LimbCommands::Reset => { println!("Received reset"); }
@@ -654,7 +654,7 @@ enum PwmCommands {
 }
 
 struct PwmActor {
-	pwmproxy :  Mutex<ProxyResult<PwmProxy>>,
+	pwmproxy :  Mutex<PwmProxy>,
 }
 
 impl Actor for PwmActor {
@@ -662,7 +662,7 @@ impl Actor for PwmActor {
 		if let Ok(_message) = Box::<Any>::downcast::<PwmCommands>(_message){
 			match *_message {
 			    PwmCommands::MoveToDegree(degree) => {
-					let pwm = self.pwmproxy.lock().unwrap().unwrap().clone();
+					let pwm = self.pwmproxy.lock().unwrap();
 					match pwm.export() {
 						Ok(()) => {
 							println!("Pwm exported");
