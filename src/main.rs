@@ -167,7 +167,9 @@ pub mod gpioaccess{
 			match self.pwm.export()
 			{
 				Ok(()) => Ok(()),
-				_ => Err(ProxyError::MonErreur),
+				Err(result) => {
+                    println!("{}",result);
+                    Err(ProxyError::MonErreur)},
 
 			}
 		}
@@ -524,9 +526,9 @@ impl Actor for Wings {
 			match *_message {
 				LimbCommands::Init(max) => { println!("Initializing with maximum {}",max); },
 				LimbCommands::Aggitate => {
+                    println!("Moving Wings");
                     let pwm18 : ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/wings/pwm18".to_owned())).cloned().unwrap();
 					_context.tell(pwm18,PwmCommands::MoveToDegree(90));
-					println!("Moving Wings");
 				},
 				LimbCommands::Reset => { println!("Received reset"); }
 			}
@@ -659,9 +661,12 @@ struct PwmActor {
 
 impl Actor for PwmActor {
     fn receive(&self, _message: Box<Any>, _context: ActorCell) {
+        println!("pwm received message");
 		if let Ok(_message) = Box::<Any>::downcast::<PwmCommands>(_message){
+            println!("pwm recognized command");
 			match *_message {
 			    PwmCommands::MoveToDegree(degree) => {
+                    println!("pwm movetodegree");
 					let pwm = self.pwmproxy.lock().unwrap();
 					match pwm.export() {
 						Ok(()) => {
@@ -681,6 +686,7 @@ impl Actor for PwmActor {
 						}
 						_ => {}
 					}
+                    println!("pwm done");
         		}			
 			}
 		}
