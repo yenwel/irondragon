@@ -191,7 +191,7 @@ pub mod gpioaccess{
 			match self.pwm.enable(enable)
 			{
 				Ok(()) => Ok(()),
-				Err(result) => {println!("{}",result.description());
+				Err(result) => {println!("{} caused by {}",result.description(),result.cause().unwrap());
 					Err(ProxyError::MonErreur)},
 			}
 		}
@@ -200,7 +200,7 @@ pub mod gpioaccess{
 		{
 			match self.pwm.set_duty_cycle_ns(duty_cycle_ns)
 			{
-				Ok(()) => Ok(()),
+				Ok(()) => {println!("setting dutycycle {}",duty_cycle_ns); Ok(())},
 				Err(result) => {println!("{}",result.description());
 					Err(ProxyError::MonErreur)},
 			}
