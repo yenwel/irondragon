@@ -706,9 +706,7 @@ impl PwmActor{
 		{
 			Ok(pwmproxy) =>  PwmActor{ pwmproxy : Mutex::new(pwmproxy) },
 			_ => { panic!("Can't create pwm actor!") },
-
-		}
-		
+		}		
     }
 }
 
