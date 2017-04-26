@@ -95,6 +95,7 @@ pub mod gpioaccess{
 	
 	use self::sysfs_gpio::{Direction, Pin};
 	use self::sysfs_pwm::{Pwm};
+	use self::std::error::Error;
 	
 	use super::{PinProxyContract,PwmProxyContract,DirectionProxied,ProxyError,ProxyResult};
 
