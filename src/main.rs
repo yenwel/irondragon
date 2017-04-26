@@ -68,7 +68,7 @@ trait PinProxyContract {
 
 trait PwmProxyContract {
 
-	fn  new(chip: u32, number: u32) -> /*ProxyResult<*/Self/*>*/ where Self: Sized;
+	fn  new(chip: u32, number: u32) -> ProxyResult<Self> where Self: Sized;
 	//FIXME :figure out mapping overloaded Result from gpio library
 	fn export(&self) -> ProxyResult<()>;
 
@@ -112,7 +112,8 @@ pub mod gpioaccess{
 			match self.pin.export()
 			{
 				Ok(()) => Ok(()),
-				_ => Err(ProxyError::MonErreur),
+				Err(result) => {println!("{}",result.description());
+					Err(ProxyError::MonErreur)},
 
 			}
 		}
@@ -121,7 +122,8 @@ pub mod gpioaccess{
 			match self.pin.unexport()
 			{
 				Ok(()) => Ok(()),
-				_ => Err(ProxyError::MonErreur),
+				Err(result) => {println!("{}",result.description());
+					Err(ProxyError::MonErreur)},
 			}
 		}
 
@@ -129,7 +131,8 @@ pub mod gpioaccess{
 			match self.pin.set_value(value)
 			{
 				Ok(()) => Ok(()),
-				_ => Err(ProxyError::MonErreur),
+				Err(result) => {println!("{}",result.description());
+					Err(ProxyError::MonErreur)},
 			}
 		}
 
@@ -143,7 +146,8 @@ pub mod gpioaccess{
 			match self.pin.set_direction(dirmapped)
 			{
 				Ok(()) => Ok(()),
-				_ => Err(ProxyError::MonErreur),
+				Err(result) => {println!("{}",result.description());
+					Err(ProxyError::MonErreur)},
 			}
 		}
     }
@@ -154,23 +158,21 @@ pub mod gpioaccess{
 
 	impl PwmProxyContract for PwmProxy
 	{
-		fn new(chip: u32, number: u32) -> /*ProxyResult<*/PwmProxy/*>*/{
+		fn new(chip: u32, number: u32) -> ProxyResult<PwmProxy>{
 			
-			/*match Pwm::new(chip, number) {
+			match Pwm::new(chip, number) {
 				Ok(pwm) => Ok(PwmProxy{ pwm: pwm}),
-				_ => Err(ProxyError::MonErreur)
-			}*/
-			PwmProxy{ pwm: Pwm::new(chip, number).unwrap()}
+				Err(result) => {println!("{}",result.description());
+					Err(ProxyError::MonErreur)},
+			}
 		}
 
 		fn export(&self) ->  ProxyResult<()>{
 			match self.pwm.export()
 			{
 				Ok(()) => Ok(()),
-				Err(result) => {
-                    println!("{}",result);
+				Err(result) => {println!("{}",result.description());
                     Err(ProxyError::MonErreur)},
-
 			}
 		}
 
@@ -178,7 +180,8 @@ pub mod gpioaccess{
 			match self.pwm.unexport()
 			{
 				Ok(()) => Ok(()),
-				_ => Err(ProxyError::MonErreur),
+				Err(result) => {println!("{}",result.description());
+					Err(ProxyError::MonErreur)},
 			}
 		}
 		
@@ -187,7 +190,8 @@ pub mod gpioaccess{
 			match self.pwm.enable(enable)
 			{
 				Ok(()) => Ok(()),
-				_ => Err(ProxyError::MonErreur),
+				Err(result) => {println!("{}",result.description());
+					Err(ProxyError::MonErreur)},
 			}
 		}
 	
@@ -196,7 +200,8 @@ pub mod gpioaccess{
 			match self.pwm.set_duty_cycle_ns(duty_cycle_ns)
 			{
 				Ok(()) => Ok(()),
-				_ => Err(ProxyError::MonErreur),
+				Err(result) => {println!("{}",result.description());
+					Err(ProxyError::MonErreur)},
 			}
 		}
 	
@@ -205,7 +210,8 @@ pub mod gpioaccess{
 			match self.pwm.set_period_ns(period_ns)
 			{
 				Ok(()) => Ok(()),
-				_ => Err(ProxyError::MonErreur),
+				Err(result) => {println!("{}",result.description());
+					Err(ProxyError::MonErreur)},
 			}
 		}
 		
@@ -214,7 +220,8 @@ pub mod gpioaccess{
 			match self.pwm.get_period_ns()
 			{
 				Ok(result) => Ok(result),
-				_ => Err(ProxyError::MonErreur),
+				Err(result) => {println!("{}",result.description());
+					Err(ProxyError::MonErreur)},
 			}
 			
 		}
@@ -232,7 +239,7 @@ pub mod gpioaccess{
     				}
     				self.pwm.set_duty_cycle_ns(period_ns).unwrap()
     			}
-    			_ => {}
+    			Err(result) => {println!("{}",result.description())}
     		}
 		}
 		
@@ -249,7 +256,7 @@ pub mod gpioaccess{
     				}
     				self.pwm.set_duty_cycle_ns(0).unwrap()
     			}
-    			_ => {}
+    			Err(result) => {println!("{}",result.description())}
     		}
 		}
 
@@ -299,8 +306,8 @@ pub mod gpioaccess{
 
 	impl PwmProxyContract for PwmProxy
 	{
-		fn new(chip: u32, number: u32) -> /*ProxyResult<*/PwmProxy/*>*/ {
-			/*Ok(*/PwmProxy{ chip : chip, number : number }/*)*/
+		fn new(chip: u32, number: u32) -> ProxyResult<PwmProxy> {
+			Ok(PwmProxy{ chip : chip, number : number })
 		}
 
 		fn export(&self) ->  ProxyResult<()>{
@@ -695,7 +702,13 @@ impl Actor for PwmActor {
 
 impl PwmActor{
 	fn new(number: u32) -> PwmActor {
-		PwmActor{ pwmproxy : Mutex::new(PwmProxy::new(0,number)) }
+		match PwmProxy::new(0,number)
+		{
+			Ok(pwmproxy) =>  PwmActor{ pwmproxy : Mutex::new(pwmproxy) },
+			_ => { panic!("Can't create pwm actor!") },
+
+		}
+		
     }
 }
 
