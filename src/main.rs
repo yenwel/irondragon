@@ -115,7 +115,6 @@ pub mod gpioaccess{
 				Ok(()) => Ok(()),
 				Err(result) => {println!("{}",result.description());
 					Err(ProxyError::MonErreur)},
-
 			}
 		}
 
