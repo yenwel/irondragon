@@ -291,11 +291,13 @@ pub mod gpioaccess{
 
 		fn set_value(&self, value: u8) -> ProxyResult<()>
 		{
+			println!("setting value pin {}",value);
 			Ok::<(),ProxyError>(())
 		}
 
 		fn set_direction(&self, dir: DirectionProxied) -> ProxyResult<()>
 		{
+			println!("setting direction pin");
 			Ok::<(),ProxyError>(())
 		}
     }
@@ -627,13 +629,13 @@ impl Actor for PinActor {
                 	match pin.export() {
                 		Ok(()) => {
 						    println!("Pin exported");
-                            for x in 1..times { 
+                            for _ in 1..times { 
                                 pin.set_direction(DirectionProxied::Out);
                                 pin.set_direction(DirectionProxied::High);
                                 thread::sleep(time::Duration::from_millis(200));
                                 pin.set_direction(DirectionProxied::Low);
                                 thread::sleep(time::Duration::from_millis(200));
-                                println!("Blink {}",x);
+                                println!("Blink");
                             }
                             match pin.unexport() {
                         		Ok(()) => {
@@ -679,20 +681,25 @@ impl Actor for PwmActor {
 					match pwm.export() {
 						Ok(()) => {
 							println!("Pwm exported");
-							pwm.enable(true).unwrap();
-							pwm.set_period_ns(20_000).unwrap();
-							for x in 1..10 {
-								pwm.increase_to_max(1000, 20);
-								pwm.decrease_to_minimum(1000, 20);
+							match pwm.enable(true)
+							{
+								Ok(()) => {
+									pwm.set_period_ns(20_000).unwrap();
+									for _ in 1..10 {
+										pwm.increase_to_max(1000, 20);
+										pwm.decrease_to_minimum(1000, 20);
+									}
+								}
+								_ => println!("Pwm enabled failed")
 							}
 							match pwm.unexport() {
 								Ok(()) => {
 									println!("Pwm unexported");
 								}
-								_ => {}
+								_ => println!("Pwm unexport failed")
 							}
 						}
-						_ => {}
+						_ => println!("Pwm export failed")
 					}
                     println!("pwm done");
         		}			
