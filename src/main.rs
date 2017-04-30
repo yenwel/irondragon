@@ -228,36 +228,40 @@ pub mod gpioaccess{
 		
 		fn increase_to_max(&self, duration_ms: u32, update_period_ms: u32)
 		{
-		    let step: f32 = duration_ms as f32 / update_period_ms as f32;
-    		let mut duty_cycle = 0.0;
-    		match self.pwm.get_period_ns()
-    		{
-    			Ok(period_ns) => {
-    				while duty_cycle < 1.0 {
-        				self.pwm.set_duty_cycle_ns((duty_cycle * period_ns as f32) as u32).unwrap();
-        				duty_cycle += step;
+		    	let step: f32 = duration_ms as f32 / update_period_ms as f32;
+    			let mut duty_cycle = 0.0;
+    			match self.pwm.get_period_ns()
+    			{
+    				Ok(period_ns) => {
+					println!("period {}",period_ns);
+    					while duty_cycle < 1.0 {
+						println!("duty cycle {}",duty_cycle);
+        					self.pwm.set_duty_cycle_ns((duty_cycle * period_ns as f32) as u32).unwrap();
+        					duty_cycle += step;
+    					}
+    					self.pwm.set_duty_cycle_ns(period_ns).unwrap()
     				}
-    				self.pwm.set_duty_cycle_ns(period_ns).unwrap()
+    				Err(result) => {println!("{}",result.description())}
     			}
-    			Err(result) => {println!("{}",result.description())}
-    		}
 		}
 		
 		fn decrease_to_minimum(&self, duration_ms: u32, update_period_ms: u32)
 		{
 			let step: f32 = duration_ms as f32 / update_period_ms as f32;
-    		let mut duty_cycle = 1.0;
-    		match self.pwm.get_period_ns()
-    		{
-    			Ok(period_ns) => {
-    				while duty_cycle > 0.0 {
-        				self.pwm.set_duty_cycle_ns((duty_cycle * period_ns as f32) as u32).unwrap();
-        				duty_cycle -= step;
+    			let mut duty_cycle = 1.0;
+    			match self.pwm.get_period_ns()
+    			{
+    				Ok(period_ns) => {
+					println!("period {}",period_ns);
+    					while duty_cycle > 0.0 {
+						println!("duty cycle {}",duty_cycle);
+        					self.pwm.set_duty_cycle_ns((duty_cycle * period_ns as f32) as u32).unwrap();
+        					duty_cycle -= step;
+    					}
+    					self.pwm.set_duty_cycle_ns(0).unwrap()
     				}
-    				self.pwm.set_duty_cycle_ns(0).unwrap()
-    			}
-    			Err(result) => {println!("{}",result.description())}
-    		}
+    				Err(result) => {println!("{}",result.description())}
+    			}	
 		}
 
     }
@@ -683,10 +687,18 @@ impl Actor for PwmActor {
 							match pwm.enable(true)
 							{
 								Ok(()) => {
-									pwm.set_period_ns(20_000).unwrap();
-									for _ in 1..10 {
-										pwm.increase_to_max(1000, 20);
-										pwm.decrease_to_minimum(1000, 20);
+									println!("Pwm enable");
+									match pwm.set_period_ns(20_000)
+									{
+										Ok(()) => {
+											println!("Pwm setting period");
+											for x in 1..10 {
+												println!("Pwm {}",x);
+												pwm.increase_to_max(1000, 20);
+												pwm.decrease_to_minimum(1000, 20);
+											}
+										}
+										_ => println!("Pwm set period failed")
 									}
 								}
 								_ => println!("Pwm enabled failed")
