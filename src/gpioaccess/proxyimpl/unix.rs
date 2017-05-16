@@ -2,8 +2,8 @@
 extern crate sysfs_gpio;
 extern crate sysfs_pwm;
 
-use sysfs_gpio::{Direction, Pin};
-use sysfs_pwm::{Pwm};
+use self::sysfs_gpio::{Direction, Pin};
+use self::sysfs_pwm::{Pwm};
 use ::std::error::Error;
 
 use super::{PinProxyContract,PwmProxyContract,DirectionProxied,ProxyError,ProxyResult};

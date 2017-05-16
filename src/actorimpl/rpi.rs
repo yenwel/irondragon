@@ -24,7 +24,7 @@ impl Actor for PinActor {
 		if let Ok(_message) = Box::<Any>::downcast::<PinCommands>(_message){
 			match *_message {
 				PinCommands::Blink(times) => {
-				let pin = self.pinproxy.lock().unwrap();
+					let pin = self.pinproxy.lock().unwrap();
 					match pin.export() {
 						Ok(()) => {
 							println!("Pin exported");
@@ -41,16 +41,17 @@ impl Actor for PinActor {
 									println!("Pin unexported");
 								}
 								_ => {}
-							
+							}
 						}
 						_ => {}
 					}
 				},
-				PinCommands::Switch => {	}
+				PinCommands::Switch => { }
 			}
 		}
 	}
 }
+
 
 impl PinActor{
 	pub fn new(pin_number: u64) -> PinActor {
