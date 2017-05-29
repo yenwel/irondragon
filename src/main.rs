@@ -88,3 +88,5 @@ fn main() {
 }
 
 mod test;
+
+mod tests;
