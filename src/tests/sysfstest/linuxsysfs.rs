@@ -9,3 +9,20 @@ use ::std::error::Error;
 fn it_works() {
     assert_eq!(1, 0+1);
 }
+
+const PWM_CHIP: u32 = 0;
+const PWM_NUMBER: u32 = 0;
+
+//http://www.jumpnowtek.com/rpi/Using-the-Raspberry-Pi-Hardware-PWM-timers.html
+//https://github.com/rust-embedded/rust-sysfs-pwm/blob/master/examples/breathe.rs
+#[test]
+#[ignore]
+fn testPwm() {
+    let pwm = Pwm::new(0, 0).unwrap();
+    pwm.export().unwrap();
+    pwm.enable(true).unwrap();
+    pwm.set_period_ns(10000000).unwrap();
+    pwm.set_duty_cycle_ns(8000000).unwrap();
+    pwm.enable(false).unwrap();    
+    pwm.unexport().unwrap()
+}
