@@ -66,7 +66,7 @@ pub enum PwmCommands {
 }
 
 pub struct PwmActor {
-	pwmproxy :  Mutex<PwmProxy>,
+	pwmproxy :  Result<Mutex<PwmProxy>,()>,
 }
 
 impl Actor for PwmActor {
@@ -77,45 +77,52 @@ impl Actor for PwmActor {
 			match *_message {
 				PwmCommands::MoveToDegree(degree) => {
 					println!("pwm movetodegree");
-					let pwm = self.pwmproxy.lock().unwrap();
-					match pwm.export() {
-						Ok(()) => {
-							println!("Pwm exported");
-							match pwm.set_period_ns(10_000_000)
-							{
+					match self.pwmproxy {
+						Ok(ref pwmproxyresult) =>
+						{
+							let pwm = pwmproxyresult.lock().unwrap();
+							match pwm.export() {
 								Ok(()) => {
-									println!("Pwm setting period");
-									match pwm.enable(true)
+									println!("Pwm exported");
+									match pwm.set_period_ns(10_000_000)
 									{
 										Ok(()) => {
-											println!("Pwm enable");
-											for x in 1..10 {
-												println!("Pwm {}",x);
-												pwm.increase_to_max(1000, 20);
-												pwm.decrease_to_minimum(1000, 20);
-											}
-											match pwm.enable(false)
+											println!("Pwm setting period");
+											match pwm.enable(true)
 											{
 												Ok(()) => {
-													println!("Pwm disable");
+													println!("Pwm enable");
+													for x in 1..10 {
+														println!("Pwm {}",x);
+														pwm.increase_to_max(1000, 20);
+														pwm.decrease_to_minimum(1000, 20);
+													}
+													match pwm.enable(false)
+													{
+														Ok(()) => {
+															println!("Pwm disable");
+														}
+														_ => println!("Pwm disabled failed")
+													}
 												}
-												_ => println!("Pwm disabled failed")
+												_ => println!("Pwm enabled failed")
 											}
 										}
-										_ => println!("Pwm enabled failed")
+										_ => println!("Pwm set period failed")
+									}
+									match pwm.unexport() {
+										Ok(()) => {
+											println!("Pwm unexported");
+										}
+										_ => println!("Pwm unexport failed")
 									}
 								}
-								_ => println!("Pwm set period failed")
-							}
-							match pwm.unexport() {
-								Ok(()) => {
-									println!("Pwm unexported");
-								}
-								_ => println!("Pwm unexport failed")
+								_ => println!("Pwm export failed")
 							}
 						}
-						_ => println!("Pwm export failed")
+						_ => println!("No Pwm")
 					}
+					
 					println!("pwm done");
 				}
 			}
@@ -127,8 +134,8 @@ impl PwmActor{
 	pub fn new(number: u32) -> PwmActor {
 		match PwmProxy::new(0,number)
 		{
-			Ok(pwmproxy) =>  PwmActor{ pwmproxy : Mutex::new(pwmproxy) },
-			_ => { panic!("Can't create pwm actor!") },
+			Ok(pwmproxy) =>  PwmActor{ pwmproxy : Ok(Mutex::new(pwmproxy)) },
+			_ => PwmActor{ pwmproxy : Err(()) },
 		}
 	}
 }
