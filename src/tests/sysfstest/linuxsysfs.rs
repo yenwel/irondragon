@@ -16,10 +16,10 @@ fn it_works() {
 #[ignore]
 fn test_pwm() {
     let pwm = Pwm::new(0, 0).unwrap();
-    pwm.export().unwrap();
-    pwm.enable(true).unwrap();
-    pwm.set_period_ns(10000000).unwrap();
-    pwm.set_duty_cycle_ns(8000000).unwrap();
-    pwm.enable(false).unwrap();    
-    pwm.unexport().unwrap()
+    assert!(pwm.export().unwrap().is_ok());
+    assert!(pwm.enable(true).unwrap().is_ok());
+    assert!(pwm.set_period_ns(10000000).unwrap().is_ok());
+    assert!(pwm.set_duty_cycle_ns(8000000).unwrap().is_ok());
+    assert!(pwm.enable(false).unwrap().is_ok());
+    assert!(pwm.unexport().unwrap().is_ok());
 }
