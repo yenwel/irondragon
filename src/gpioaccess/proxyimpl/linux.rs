@@ -5,6 +5,8 @@ extern crate sysfs_pwm;
 use self::sysfs_gpio::{Direction, Pin};
 use self::sysfs_pwm::{Pwm};
 use ::std::error::Error;
+use std::thread;
+use std::time;
 
 use super::{PinProxyContract,PwmProxyContract,DirectionProxied,ProxyError,ProxyResult};
 
@@ -137,23 +139,24 @@ impl PwmProxyContract for PwmProxy
 	
 	fn increase_to_max(&self, duration_ms: u32, update_period_ms: u32)
 	{
-			let step: f32 = (duration_ms as f32 / update_period_ms as f32) / 1000.0;
-			println!("step {}",step);
-			let mut duty_cycle = 0.0;
-			match self.pwm.get_period_ns()
-			{
-				Ok(period_ns) => {
-				println!("period {}",period_ns);
-					while duty_cycle < 1.0 {
-						println!("duty cycle {}",duty_cycle);						
-						println!("set duty cycle ns{}",(duty_cycle * period_ns as f32) as u32);
-						self.pwm.set_duty_cycle_ns((duty_cycle * period_ns as f32) as u32).unwrap();
-						duty_cycle += step;
-					}
-					self.pwm.set_duty_cycle_ns(period_ns).unwrap()
+		let step: f32 = (duration_ms as f32 / update_period_ms as f32) / 1000.0;
+		println!("step {}",step);
+		let mut duty_cycle = 0.0;
+		match self.pwm.get_period_ns()
+		{
+			Ok(period_ns) => {
+			println!("period {}",period_ns);
+				while duty_cycle < 1.0 {
+					println!("duty cycle {}",duty_cycle);						
+					println!("set duty cycle ns{}",(duty_cycle * period_ns as f32) as u32);
+					self.pwm.set_duty_cycle_ns((duty_cycle * period_ns as f32) as u32).unwrap();
+					duty_cycle += step;
+					thread::sleep(time::Duration::from_millis(20));
 				}
-				Err(result) => {println!("{}",result.description())}
+				self.pwm.set_duty_cycle_ns(period_ns).unwrap()
 			}
+			Err(result) => {println!("{}",result.description())}
+		}
 	}
 	
 	fn decrease_to_minimum(&self, duration_ms: u32, update_period_ms: u32)
@@ -168,8 +171,9 @@ impl PwmProxyContract for PwmProxy
 				while duty_cycle > 0.0 {
 					println!("duty cycle {}",duty_cycle);
 					println!("set duty cycle ns{}",(duty_cycle * period_ns as f32) as u32);
-						self.pwm.set_duty_cycle_ns((duty_cycle * period_ns as f32) as u32).unwrap();
-						duty_cycle -= step;
+					self.pwm.set_duty_cycle_ns((duty_cycle * period_ns as f32) as u32).unwrap();
+					duty_cycle -= step;
+					thread::sleep(time::Duration::from_millis(20));
 				}
 				self.pwm.set_duty_cycle_ns(0).unwrap()
 			}
