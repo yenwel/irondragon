@@ -81,24 +81,24 @@ impl Actor for PwmActor {
 					match pwm.export() {
 						Ok(()) => {
 							println!("Pwm exported");
-							match pwm.enable(true)
+							match pwm.set_period_ns(20_000)
 							{
 								Ok(()) => {
-									println!("Pwm enable");
-									match pwm.set_period_ns(20_000)
+									println!("Pwm setting period");
+									match pwm.enable(true)
 									{
 										Ok(()) => {
-											println!("Pwm setting period");
+											println!("Pwm enable");
 											for x in 1..10 {
 												println!("Pwm {}",x);
 												pwm.increase_to_max(1000, 20);
 												pwm.decrease_to_minimum(1000, 20);
 											}
 										}
-										_ => println!("Pwm set period failed")
+										_ => println!("Pwm enabled failed")
 									}
 								}
-								_ => println!("Pwm enabled failed")
+								_ => println!("Pwm set period failed")
 							}
 							match pwm.unexport() {
 								Ok(()) => {
