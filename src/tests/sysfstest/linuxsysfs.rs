@@ -10,14 +10,11 @@ fn it_works() {
     assert_eq!(1, 0+1);
 }
 
-const PWM_CHIP: u32 = 0;
-const PWM_NUMBER: u32 = 0;
-
 //http://www.jumpnowtek.com/rpi/Using-the-Raspberry-Pi-Hardware-PWM-timers.html
 //https://github.com/rust-embedded/rust-sysfs-pwm/blob/master/examples/breathe.rs
 #[test]
 #[ignore]
-fn testPwm() {
+fn test_pwm() {
     let pwm = Pwm::new(0, 0).unwrap();
     pwm.export().unwrap();
     pwm.enable(true).unwrap();
