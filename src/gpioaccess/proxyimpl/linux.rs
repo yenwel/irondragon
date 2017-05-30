@@ -137,7 +137,7 @@ impl PwmProxyContract for PwmProxy
 	
 	fn increase_to_max(&self, duration_ms: u32, update_period_ms: u32)
 	{
-			let step: f32 = duration_ms as f32 / update_period_ms as f32;
+			let step: f32 = (duration_ms as f32 / update_period_ms as f32) / 1000.0;
 			println!("step {}",step);
 			let mut duty_cycle = 0.0;
 			match self.pwm.get_period_ns()
@@ -158,7 +158,7 @@ impl PwmProxyContract for PwmProxy
 	
 	fn decrease_to_minimum(&self, duration_ms: u32, update_period_ms: u32)
 	{
-		let step: f32 = duration_ms as f32 / update_period_ms as f32;
+		let step: f32 = (duration_ms as f32 / update_period_ms as f32) / 1000.0;
 		println!("step {}",step);
 		let mut duty_cycle = 1.0;
 		match self.pwm.get_period_ns()
