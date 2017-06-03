@@ -84,7 +84,7 @@ impl Actor for PwmActor {
 							match pwm.export() {
 								Ok(()) => {
 									println!("Pwm exported");
-									match pwm.set_period_ns(50_000_000)
+									match pwm.set_period_ns(10_000_000)
 									{
 										Ok(()) => {
 											println!("Pwm setting period");
