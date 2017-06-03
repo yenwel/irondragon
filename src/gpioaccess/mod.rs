@@ -57,9 +57,9 @@ pub trait PwmProxyContract {
 	
 	fn get_period_ns(&self) -> ProxyResult<u32>;
 	
-	fn increase_to_max(&self, duration_ms: u32, update_period_ms: u32);
+	fn increase_to_max(&self, step : f32);
 
-	fn decrease_to_minimum(&self, duration_ms: u32, update_period_ms: u32);
+	fn decrease_to_minimum(&self, step : f32);
 }
 
 
