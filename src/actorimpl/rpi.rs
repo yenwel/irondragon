@@ -31,9 +31,9 @@ impl Actor for PinActor {
 							for _ in 1..times {
 								pin.set_direction(DirectionProxied::Out);
 								pin.set_direction(DirectionProxied::High);
-								thread::sleep(time::Duration::from_millis(200));
+								thread::sleep(time::Duration::from_millis(400));
 								pin.set_direction(DirectionProxied::Low);
-								thread::sleep(time::Duration::from_millis(200));
+								thread::sleep(time::Duration::from_millis(400));
 								println!("Blink");
 							}
 							match pin.unexport() {

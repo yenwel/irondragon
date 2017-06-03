@@ -151,7 +151,7 @@ impl PwmProxyContract for PwmProxy
 					println!("set duty cycle ns{}",(duty_cycle * period_ns as f32) as u32);
 					self.pwm.set_duty_cycle_ns((duty_cycle * period_ns as f32) as u32).unwrap();
 					duty_cycle += step;
-					thread::sleep(time::Duration::from_millis(20));
+					thread::sleep(time::Duration::from_millis(200));
 				}
 				self.pwm.set_duty_cycle_ns(period_ns).unwrap()
 			}
@@ -173,7 +173,7 @@ impl PwmProxyContract for PwmProxy
 					println!("set duty cycle ns{}",(duty_cycle * period_ns as f32) as u32);
 					self.pwm.set_duty_cycle_ns((duty_cycle * period_ns as f32) as u32).unwrap();
 					duty_cycle -= step;
-					thread::sleep(time::Duration::from_millis(20));
+					thread::sleep(time::Duration::from_millis(200));
 				}
 				self.pwm.set_duty_cycle_ns(0).unwrap()
 			}

@@ -168,7 +168,7 @@ impl Actor for Eyes {
 				LimbCommands::Aggitate => {
 					println!("Blinking Eyes");
 					let pin22 : ActorRef = _context.children().get(&ActorPath::new_local("/user/gorynich/eyes/pin22".to_owned())).cloned().unwrap();
-					_context.tell(pin22,PinCommands::Blink(5));
+					_context.tell(pin22,PinCommands::Blink(20));
 				},
 				LimbCommands::Reset => { println!("Received reset"); }
 			}
