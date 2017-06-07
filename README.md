@@ -70,5 +70,6 @@ http://www.demorgen.be/fotografie/het-mooiste-steegje-van-gent-fec06aa8/
 * https://stackoverflow.com/questions/35062852/npm-vs-bower-vs-browserify-vs-gulp-vs-grunt-vs-webpack
 * http://fountainjs.io
 * https://www.npmjs.com/package/generator-elm-spa
+* https://blog.sicara.com/a-progressive-web-application-with-vue-js-webpack-material-design-part-1-c243e2e6e402
 
 On Windows in Powershell: $env:RUST_BACKTRACE = 1
