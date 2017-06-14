@@ -72,14 +72,11 @@ http://www.demorgen.be/fotografie/het-mooiste-steegje-van-gent-fec06aa8/
 * https://www.npmjs.com/package/generator-elm-spa
 * https://blog.sicara.com/a-progressive-web-application-with-vue-js-webpack-material-design-part-1-c243e2e6e402
 * https://github.com/housleyjk/ws-rs
-<<<<<<< HEAD
 * https://github.com/Florob/rust-xmpp
 * https://sipjs.com/
 * https://www.jsxc.org/
 * https://community.letsencrypt.org/t/certificates-for-hosts-on-private-networks/174/30
-=======
 * http://peerjs.com/
 * http://www.ericerfanian.com/mobile-mesh-networks-with-the-raspberry-pi-part-4/
->>>>>>> d6e8e7298c420d8126f0649120a84017f3cb9043
 
 On Windows in Powershell: $env:RUST_BACKTRACE = 1
