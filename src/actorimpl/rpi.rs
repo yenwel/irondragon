@@ -94,8 +94,8 @@ impl Actor for PwmActor {
 													println!("Pwm enable");
 													for x in 1..10 {
 														println!("Pwm {}",x);
-														pwm.increase_to_max(0.05);
-														pwm.decrease_to_minimum(0.05);
+														pwm.increase_to_max(0.25);
+														pwm.decrease_to_minimum(0.25);
 													}
 													match pwm.enable(false)
 													{
