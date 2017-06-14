@@ -78,5 +78,6 @@ http://www.demorgen.be/fotografie/het-mooiste-steegje-van-gent-fec06aa8/
 * https://community.letsencrypt.org/t/certificates-for-hosts-on-private-networks/174/30
 * http://peerjs.com/
 * http://www.ericerfanian.com/mobile-mesh-networks-with-the-raspberry-pi-part-4/
+* https://nbaksalyar.github.io/2015/07/10/writing-chat-in-rust.html
 
 On Windows in Powershell: $env:RUST_BACKTRACE = 1
