@@ -1,5 +1,5 @@
 <template>
-  <div class="card-image">
+  <div class="limb-image">
   </div>
 </template>
 <script>
