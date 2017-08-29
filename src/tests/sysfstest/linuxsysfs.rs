@@ -2,12 +2,12 @@ extern crate sysfs_gpio;
 extern crate sysfs_pwm;
 
 use self::sysfs_gpio::{Direction, Pin};
-use self::sysfs_pwm::{Pwm};
-use ::std::error::Error;
+use self::sysfs_pwm::Pwm;
+use std::error::Error;
 
 #[test]
 fn it_works() {
-    assert_eq!(1, 0+1);
+    assert_eq!(1, 0 + 1);
 }
 
 //http://www.jumpnowtek.com/rpi/Using-the-Raspberry-Pi-Hardware-PWM-timers.html

@@ -1,27 +1,27 @@
 extern crate robots;
 
-use robots::actors::{Actor,ActorCell};
+use robots::actors::{Actor, ActorCell};
 use std::sync::Mutex;
 use std::any::Any;
 use std::thread;
 use std::time;
-use super::super::gpioaccess::{DirectionProxied,PinProxyContract,PwmProxyContract};
-use super::super::gpioaccess::proxyimpl::{PinProxy,PwmProxy};
+use super::super::gpioaccess::{DirectionProxied, PinProxyContract, PwmProxyContract};
+use super::super::gpioaccess::proxyimpl::{PinProxy, PwmProxy};
 
 
-#[derive(Copy, Clone, PartialEq,Debug)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub enum PinCommands {
 	Blink(u64),
 	Switch,
 }
 
 pub struct PinActor {
-	pinproxy :  Mutex<PinProxy>,
+	pinproxy: Mutex<PinProxy>,
 }
 
 impl Actor for PinActor {
 	fn receive(&self, _message: Box<Any>, _context: ActorCell) {
-		if let Ok(_message) = Box::<Any>::downcast::<PinCommands>(_message){
+		if let Ok(_message) = Box::<Any>::downcast::<PinCommands>(_message) {
 			match *_message {
 				PinCommands::Blink(times) => {
 					let pin = self.pinproxy.lock().unwrap();
@@ -45,41 +45,42 @@ impl Actor for PinActor {
 						}
 						_ => {}
 					}
-				},
-				PinCommands::Switch => { }
+				}
+				PinCommands::Switch => {}
 			}
 		}
 	}
 }
 
 
-impl PinActor{
+impl PinActor {
 	pub fn new(pin_number: u64) -> PinActor {
-		PinActor{ pinproxy : Mutex::new(PinProxy::new(pin_number)) }
+		PinActor {
+			pinproxy: Mutex::new(PinProxy::new(pin_number)),
+		}
 	}
 }
 
 
-#[derive(Copy, Clone, PartialEq,Debug)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub enum PwmCommands {
-	MoveToDegree(u16)
+	MoveToDegree(u16),
 }
 
 pub struct PwmActor {
-	pwmproxy :  Result<Mutex<PwmProxy>,()>,
+	pwmproxy: Result<Mutex<PwmProxy>, ()>,
 }
 
 impl Actor for PwmActor {
 	fn receive(&self, _message: Box<Any>, _context: ActorCell) {
 		println!("pwm received message");
-		if let Ok(_message) = Box::<Any>::downcast::<PwmCommands>(_message){
+		if let Ok(_message) = Box::<Any>::downcast::<PwmCommands>(_message) {
 			println!("pwm recognized command");
 			match *_message {
 				PwmCommands::MoveToDegree(degree) => {
 					println!("pwm movetodegree");
 					match self.pwmproxy {
-						Ok(ref pwmproxyresult) =>
-						{
+						Ok(ref pwmproxyresult) => {
 							let pwm = pwmproxyresult.lock().unwrap();
 							match pwm.export() {
 								Ok(()) => {
@@ -117,12 +118,12 @@ impl Actor for PwmActor {
 										_ => println!("Pwm unexport failed")
 									}
 								}
-								_ => println!("Pwm export failed")
+								_ => println!("Pwm export failed"),
 							}
 						}
-						_ => println!("No Pwm")
+						_ => println!("No Pwm"),
 					}
-					
+
 					println!("pwm done");
 				}
 			}
@@ -130,12 +131,13 @@ impl Actor for PwmActor {
 	}
 }
 
-impl PwmActor{
+impl PwmActor {
 	pub fn new(number: u32) -> PwmActor {
-		match PwmProxy::new(0,number)
-		{
-			Ok(pwmproxy) =>  PwmActor{ pwmproxy : Ok(Mutex::new(pwmproxy)) },
-			_ => PwmActor{ pwmproxy : Err(()) },
+		match PwmProxy::new(0, number) {
+			Ok(pwmproxy) => PwmActor {
+				pwmproxy: Ok(Mutex::new(pwmproxy)),
+			},
+			_ => PwmActor { pwmproxy: Err(()) },
 		}
 	}
 }
