@@ -80,5 +80,7 @@ http://www.demorgen.be/fotografie/het-mooiste-steegje-van-gent-fec06aa8/
 * http://www.ericerfanian.com/mobile-mesh-networks-with-the-raspberry-pi-part-4/
 * https://nbaksalyar.github.io/2015/07/10/writing-chat-in-rust.html
 * https://serverfault.com/questions/171678/nginx-config-front-end-reverse-proxy-to-another-port
+* https://github.com/mpatacchiola/deepgaze
+
 
 On Windows in Powershell: $env:RUST_BACKTRACE = 1
