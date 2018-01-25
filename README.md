@@ -84,6 +84,7 @@ http://www.demorgen.be/fotografie/het-mooiste-steegje-van-gent-fec06aa8/
 * https://raspberrypi.stackexchange.com/questions/38902/camera-input-from-phone-to-raspberry-pi
 * http://teknosrc.com/raspberry-pi-usb-tethering-how-to-make-internet-work-in-raspberry-pi-by-usb-tethering/
 * https://howto-android.com/setting-up-hotspot-or-tethering-on-acer-liquid-z520/
-
+* http://www.instructables.com/id/Google-Tensorflow-on-Rapsberry-Pi/
+* https://github.com/samjabrahams/tensorflow-on-raspberry-pi/
 
 On Windows in Powershell: $env:RUST_BACKTRACE = 1
