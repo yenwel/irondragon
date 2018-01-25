@@ -82,6 +82,8 @@ http://www.demorgen.be/fotografie/het-mooiste-steegje-van-gent-fec06aa8/
 * https://serverfault.com/questions/171678/nginx-config-front-end-reverse-proxy-to-another-port
 * https://github.com/mpatacchiola/deepgaze
 * https://raspberrypi.stackexchange.com/questions/38902/camera-input-from-phone-to-raspberry-pi
+* http://teknosrc.com/raspberry-pi-usb-tethering-how-to-make-internet-work-in-raspberry-pi-by-usb-tethering/
+* https://howto-android.com/setting-up-hotspot-or-tethering-on-acer-liquid-z520/
 
 
 On Windows in Powershell: $env:RUST_BACKTRACE = 1
