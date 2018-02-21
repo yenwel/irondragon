@@ -63,8 +63,8 @@ pub trait PwmProxyContract {
 }
 
 #[cfg(target_os = "linux")]
-#[path = "proxyimpl\\linux.rs"]
+#[path = "proxyimpl/linux.rs"]
 pub mod proxyimpl;
 #[cfg(not(target_os = "linux"))]
-#[path = "proxyimpl\\nonlinux.rs"]
+#[path = "proxyimpl/nonlinux.rs"]
 pub mod proxyimpl;
