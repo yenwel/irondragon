@@ -86,5 +86,6 @@ http://www.demorgen.be/fotografie/het-mooiste-steegje-van-gent-fec06aa8/
 * https://howto-android.com/setting-up-hotspot-or-tethering-on-acer-liquid-z520/
 * http://www.instructables.com/id/Google-Tensorflow-on-Rapsberry-Pi/
 * https://github.com/samjabrahams/tensorflow-on-raspberry-pi/
+* http://blog.pixarea.com/2017/02/travis+rails+nodejs/
 
 On Windows in Powershell: $env:RUST_BACKTRACE = 1
