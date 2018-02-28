@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HomeView from '@/components/HomeView'
+import ControlView from '@/components/ControlView'
 import LimbView from '@/components/LimbView'
-import ChatView from '@/components/ChatView'
+import RiddleView from '@/components/RiddleView'
 
 Vue.use(Router)
 
@@ -10,8 +10,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Home',
-      component: HomeView
+      name: 'Control',
+      component: ControlView
     },
     {
       path: '/Limb/:limb',
@@ -19,9 +19,9 @@ export default new Router({
       component: LimbView
     },
     {
-      path: '/Chat',
-      name: 'Chat',
-      component: ChatView
+      path: '/Riddle',
+      name: 'Riddle',
+      component: RiddleView
     }
   ]
 })
