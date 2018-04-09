@@ -10,13 +10,13 @@
           document.getElementById("result").innerHTML = this.responseText;
           }
         };
-        xhttp.open("GET", "api/"+part, true);
+        xhttp.open("POST", "api/"+part, true);
         xhttp.send();
       }
     </script>
   </head>
   <body>
-    <div id="example">
+    <div id="dragon">
       <button type="button" onclick="doCall('wings')" id="wings">Move wings</button>
       <button type="button" onclick="doCall('mouth')" id="mouth">Open mouth</button>
       <button type="button" onclick="doCall('eyes')" id="eyes">Blink eyes</button>          

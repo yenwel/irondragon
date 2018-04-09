@@ -1,11 +1,11 @@
 <template>
   <div class="hello">
     <md-content class="md-elevation-3">
-      <h4>{{ msg }}</h4>
-      <div class="actions md-layout md-alignment-center-space-between">
+      <div class="md-body-2">{{ msg }}</div>
+      <div class="actions">
         <md-button class="md-raised md-primary" @click="moveWings">Move wings</md-button>
       </div>
-      <h4>{{ wingsmsg }}</h4>
+      <div class="md-body-2">{{ wingsmsg }}</div>
     </md-content>
   </div>
 </template>
