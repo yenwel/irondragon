@@ -11,6 +11,9 @@
 </template>
 
 <script>
+import axios from 'axios'
+import _ from 'lodash'
+
 export default {
   name: 'hello',
   data () {
@@ -20,10 +23,12 @@ export default {
     }
   },
   methods: {
-    moveWings: function (command) {
+    moveWings: _.debounce(() => {
       this.wingsmsg = 'Moving Wings'
-    }
-
+      axios.post('/api/wings')
+      .then(response => { this.wingsmsg = response.statusText })
+      .catch(e => console.log(e))
+    }, 20)
   }
 }
 </script>
