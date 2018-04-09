@@ -8,7 +8,7 @@
     <div class="mdl-layout__drawer">
       <span class="mdl-layout-title">Iron Dragon</span>
       <nav class="mdl-navigation">
-        <router-link class="mdl-navigation__link" to="/Control" @click.native="hideMenu">Control</router-link>
+        <router-link class="mdl-navigation__link" to="/" @click.native="hideMenu">Control</router-link>
         <router-link class="mdl-navigation__link" to="/Riddle" @click.native="hideMenu">Riddle</router-link>
       </nav>
     </div>
