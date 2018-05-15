@@ -30,7 +30,6 @@ impl Key for Sys {
 
 fn main() {
     match env_logger::init() {
-        Ok(()) => {}
         _ => {}
     };
     let dragon_actor_system = ActorSystem::new("dragon".to_owned());
