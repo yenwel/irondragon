@@ -11,6 +11,7 @@ staticfile = "*"
 RobotS = { version = "*",  git = "https://github.com/gamazeps/RobotS" }
 persistent = "*"
 env_logger = "*"
+rodio ="*"
 
 [target.'cfg(unix)'.dependencies]
 sysfs_gpio = "*"

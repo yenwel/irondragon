@@ -1,3 +1,4 @@
+
 extern crate robots;
 
 use std::fmt::{Debug, Display, Formatter, Result};
@@ -5,6 +6,7 @@ use std::sync::Arc;
 use std::any::Any;
 use robots::actors::{Actor, ActorCell, ActorContext, ActorPath, ActorRef, Props};
 use super::rpi::{PinActor, PinCommands, PwmActor, PwmCommands};
+use super::sound::{SoundActor, SoundCommands};
 
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum DragonCommands {
@@ -161,6 +163,11 @@ impl Wings {
 struct Mouth;
 
 impl Actor for Mouth {
+    fn pre_start(&self, context: ActorCell) {
+        context
+            .actor_of(Props::new(Arc::new(SoundActor::new),()), "soundactor".to_owned())
+            .unwrap();
+    }
     fn receive(&self, _message: Box<Any>, _context: ActorCell) {
         if let Ok(_message) = Box::<Any>::downcast::<LimbCommands>(_message) {
             match *_message {
@@ -169,6 +176,14 @@ impl Actor for Mouth {
                 }
                 LimbCommands::Aggitate => {
                     println!("Opening Mouth");
+                    let sound: ActorRef = _context
+                        .children()
+                        .get(&ActorPath::new_local(
+                            "/user/gorynich/mouth/soundactor".to_owned(),
+                        ))
+                        .cloned()
+                        .unwrap();
+                    _context.tell(sound, SoundCommands::PlayRoar);
                 }
                 LimbCommands::Reset => {
                     println!("Received reset");

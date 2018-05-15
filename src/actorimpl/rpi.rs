@@ -69,6 +69,7 @@ pub struct PwmActor {
 }
 
 impl Actor for PwmActor {
+
     fn receive(&self, _message: Box<Any>, _context: ActorCell) {
         println!("pwm received message");
         if let Ok(_message) = Box::<Any>::downcast::<PwmCommands>(_message) {
