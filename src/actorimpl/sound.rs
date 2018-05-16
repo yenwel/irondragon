@@ -20,10 +20,10 @@ impl Actor for SoundActor {
              match *message {
                 SoundCommands::PlayRoar => {
                     let device = rodio::default_output_device().unwrap();
+                    let sink = rodio::Sink::new(&device);
                     let file = File::open("static/roar.wav").unwrap();
-                    let mut roar = rodio::play_once(&device, BufReader::new(file)).unwrap();
-                    roar.set_volume(0.2);
-                    println!("Started roar");
+                    sink.append(rodio::Decoder::new(BufReader::new(file)).unwrap());
+                    sink.sleep_until_end();
                 }
              }
         }
