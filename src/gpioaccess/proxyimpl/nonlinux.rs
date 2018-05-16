@@ -22,23 +22,17 @@ impl PinProxyContract for PinProxy {
         Ok::<(), ProxyError>(())
     }
 
-    fn set_direction(&self, dir: DirectionProxied) -> ProxyResult<()> {
+    fn set_direction(&self, _dir: DirectionProxied) -> ProxyResult<()> {
         println!("setting direction pin");
         Ok::<(), ProxyError>(())
     }
 }
 
-pub struct PwmProxy {
-    chip: u32,
-    number: u32,
-}
+pub struct PwmProxy {}
 
 impl PwmProxyContract for PwmProxy {
     fn new(chip: u32, number: u32) -> ProxyResult<PwmProxy> {
-        Ok(PwmProxy {
-            chip: chip,
-            number: number,
-        })
+        Ok(PwmProxy { })
     }
 
     fn export(&self) -> ProxyResult<()> {

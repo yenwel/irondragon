@@ -15,7 +15,7 @@ pub enum SoundCommands {
 pub struct SoundActor;
 
 impl Actor for SoundActor {
-    fn receive(&self, message: Box<Any>, context: ActorCell) {
+    fn receive(&self, message: Box<Any>, _context: ActorCell) {
         if let Ok(message) = Box::<Any>::downcast::<SoundCommands>(message) {
              match *message {
                 SoundCommands::PlayRoar => {
