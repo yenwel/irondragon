@@ -5,7 +5,7 @@ use std::sync::Mutex;
 use std::any::Any;
 use std::thread;
 use std::time;
-use super::super::gpioaccess::{DirectionProxied, PinProxyContract, PwmProxyContract};
+use super::super::gpioaccess::{DirectionProxied, PinProxyContract, PwmProxyContract, ProxyError};
 use super::super::gpioaccess::proxyimpl::{PinProxy, PwmProxy};
 
 #[derive(Copy, Clone, PartialEq, Debug)]
@@ -23,25 +23,8 @@ impl Actor for PinActor {
         if let Ok(_message) = Box::<Any>::downcast::<PinCommands>(_message) {
             match *_message {
                 PinCommands::Blink(times) => {
-                    let pin = self.pinproxy.lock().unwrap();
-                    match pin.export() {
-                        Ok(()) => {
-                            println!("Pin exported");
-                            for _ in 1..times {
-                                pin.set_direction(DirectionProxied::Out);
-                                pin.set_direction(DirectionProxied::High);
-                                thread::sleep(time::Duration::from_millis(400));
-                                pin.set_direction(DirectionProxied::Low);
-                                thread::sleep(time::Duration::from_millis(400));
-                                println!("Blink");
-                            }
-                            match pin.unexport() {
-                                Ok(()) => {
-                                    println!("Pin unexported");
-                                }
-                                _ => {}
-                            }
-                        }
+                    match Self::blink(self, times) {
+                        Ok(()) => {}
                         _ => {}
                     }
                 }
@@ -51,10 +34,37 @@ impl Actor for PinActor {
     }
 }
 
+   
+
 impl PinActor {
     pub fn new(pin_number: u64) -> PinActor {
         PinActor {
             pinproxy: Mutex::new(PinProxy::new(pin_number)),
+        }
+    }
+
+     fn blink(&self, times : u64) -> Result<(),ProxyError> {
+        let pin = self.pinproxy.lock().unwrap();
+        match pin.export() {
+            Ok(()) => {
+                println!("Pin exported");
+                for _ in 1..times {
+                    try!(pin.set_direction(DirectionProxied::Out));
+                    try!(pin.set_direction(DirectionProxied::High));
+                    thread::sleep(time::Duration::from_millis(400));
+                    try!(pin.set_direction(DirectionProxied::Low));
+                    thread::sleep(time::Duration::from_millis(400));
+                    println!("Blink");
+                }
+                match pin.unexport() {
+                    Ok(()) => {
+                        println!("Pin unexported");
+                        Ok(())
+                    }
+                    _ => Ok(())
+                }
+            }
+            _ => Ok(())
         }
     }
 }
@@ -75,51 +85,11 @@ impl Actor for PwmActor {
         if let Ok(_message) = Box::<Any>::downcast::<PwmCommands>(_message) {
             println!("pwm recognized command");
             match *_message {
-                PwmCommands::MoveToDegree(degree) => {
-                    println!("pwm movetodegree");
-                    match self.pwmproxy {
-                        Ok(ref pwmproxyresult) => {
-                            let pwm = pwmproxyresult.lock().unwrap();
-                            match pwm.export() {
-                                Ok(()) => {
-                                    println!("Pwm exported");
-                                    match pwm.set_period_ns(2_500_000) {
-                                        Ok(()) => {
-                                            println!("Pwm setting period");
-                                            match pwm.enable(true) {
-                                                Ok(()) => {
-                                                    println!("Pwm enable");
-                                                    for x in 1..10 {
-                                                        println!("Pwm {}", x);
-                                                        pwm.increase_to_max(0.25);
-                                                        pwm.decrease_to_minimum(0.25);
-                                                    }
-                                                    match pwm.enable(false) {
-                                                        Ok(()) => {
-                                                            println!("Pwm disable");
-                                                        }
-                                                        _ => println!("Pwm disabled failed"),
-                                                    }
-                                                }
-                                                _ => println!("Pwm enabled failed"),
-                                            }
-                                        }
-                                        _ => println!("Pwm set period failed"),
-                                    }
-                                    match pwm.unexport() {
-                                        Ok(()) => {
-                                            println!("Pwm unexported");
-                                        }
-                                        _ => println!("Pwm unexport failed"),
-                                    }
-                                }
-                                _ => println!("Pwm export failed"),
-                            }
-                        }
-                        _ => println!("No Pwm"),
+                PwmCommands::MoveToDegree(_degree) => {
+                    match Self::movetodegree(self) {
+                        Ok(()) => {}
+                        _ => {}
                     }
-
-                    println!("pwm done");
                 }
             }
         }
@@ -133,6 +103,32 @@ impl PwmActor {
                 pwmproxy: Ok(Mutex::new(pwmproxy)),
             },
             _ => PwmActor { pwmproxy: Err(()) },
+        }
+    }
+
+    pub fn movetodegree(&self) -> Result<(),ProxyError> {
+        println!("pwm movetodegree");
+        match self.pwmproxy {
+            Ok(ref pwmproxyresult) => {
+                let pwm = pwmproxyresult.lock().unwrap();
+                try!(pwm.export());
+                println!("Pwm exported");
+                try!(pwm.set_period_ns(2_500_000));
+                println!("Pwm setting period");
+                try!(pwm.enable(true));
+                println!("Pwm enable");
+                for x in 1..10 {
+                    println!("Pwm {}", x);
+                    pwm.increase_to_max(0.25);
+                    pwm.decrease_to_minimum(0.25);
+                }
+                try!(pwm.enable(false));
+                println!("Pwm disable");
+                try!(pwm.unexport());
+                println!("pwm done");
+                Ok(())
+            }
+            _ => Err(ProxyError::MonErreur)
         }
     }
 }

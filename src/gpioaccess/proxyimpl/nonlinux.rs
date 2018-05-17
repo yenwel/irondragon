@@ -31,7 +31,7 @@ impl PinProxyContract for PinProxy {
 pub struct PwmProxy {}
 
 impl PwmProxyContract for PwmProxy {
-    fn new(chip: u32, number: u32) -> ProxyResult<PwmProxy> {
+    fn new(_chip: u32, _number: u32) -> ProxyResult<PwmProxy> {
         Ok(PwmProxy { })
     }
 
@@ -43,15 +43,15 @@ impl PwmProxyContract for PwmProxy {
         Ok::<(), ProxyError>(())
     }
 
-    fn enable(&self, enable: bool) -> ProxyResult<()> {
+    fn enable(&self, _enable: bool) -> ProxyResult<()> {
         Ok::<(), ProxyError>(())
     }
 
-    fn set_duty_cycle_ns(&self, duty_cycle_ns: u32) -> ProxyResult<()> {
+    fn set_duty_cycle_ns(&self, _duty_cycle_ns: u32) -> ProxyResult<()> {
         Ok::<(), ProxyError>(())
     }
 
-    fn set_period_ns(&self, period_ns: u32) -> ProxyResult<()> {
+    fn set_period_ns(&self, _period_ns: u32) -> ProxyResult<()> {
         Ok::<(), ProxyError>(())
     }
 
@@ -59,7 +59,7 @@ impl PwmProxyContract for PwmProxy {
         Ok::<u32, ProxyError>(1)
     }
 
-    fn increase_to_max(&self, step: f32) {}
+    fn increase_to_max(&self, _step: f32) {}
 
-    fn decrease_to_minimum(&self, step: f32) {}
+    fn decrease_to_minimum(&self, _step: f32) {}
 }
