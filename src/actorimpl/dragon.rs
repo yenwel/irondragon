@@ -98,13 +98,13 @@ impl Dragon {
 enum LimbCommands {
     Init(u64),
     Aggitate,
-    Reset,
+    //Reset,
 }
 
 #[derive(Copy, Clone, PartialEq, Debug)]
 enum LimbEvents {
-    Aggitated,
-    NotAggitated(u64),
+    //Aggitated,
+    //NotAggitated(u64),
 }
 
 impl Display for LimbCommands {
@@ -144,9 +144,9 @@ impl Actor for Wings {
                         .unwrap();
                     _context.tell(pwm18, PwmCommands::MoveToDegree(90));
                 }
-                LimbCommands::Reset => {
+                /*LimbCommands::Reset => {
                     println!("Received reset");
-                }
+                }*/
             }
         } else {
             println!("Gorynich does not understand!");
@@ -185,9 +185,9 @@ impl Actor for Mouth {
                         .unwrap();
                     _context.tell(sound, SoundCommands::PlayRoar);
                 }
-                LimbCommands::Reset => {
+                /*LimbCommands::Reset => {
                     println!("Received reset");
-                }
+                }*/
             }
         } else {
             println!("Gorynich does not understand!");
@@ -227,9 +227,9 @@ impl Actor for Eyes {
                         .unwrap();
                     _context.tell(pin22, PinCommands::Blink(20));
                 }
-                LimbCommands::Reset => {
+                /*LimbCommands::Reset => {
                     println!("Received reset");
-                }
+                }*/
             }
         } else {
             println!("Gorynich does not understand!");
