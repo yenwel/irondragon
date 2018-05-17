@@ -1,4 +1,4 @@
-![alt tag](https://travis-ci.org/yenwel/irondragon.svg?branch=master)
+[![Build Status](https://travis-ci.org/yenwel/irondragon.svg?branch=master)](https://travis-ci.org/yenwel/irondragon)
 # irondragon
 
 ![alt tag](https://upload.wikimedia.org/wikipedia/commons/2/2c/Zmei_Gorinich_%28colour_fixed%29.jpg)
