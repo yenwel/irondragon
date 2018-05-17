@@ -1,6 +1,8 @@
 extern crate sysfs_gpio;
 extern crate sysfs_pwm;
 
+use self::sysfs_pwm::Pwm;
+
 #[test]
 fn it_works() {
     assert_eq!(1, 0 + 1);
